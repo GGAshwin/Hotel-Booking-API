@@ -1,0 +1,13 @@
+{
+  "scripts": {
+    "local": "nodemon index.js",
+    "start": "node index.js",
+    "init-db": "node connect.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "express": "^4.21.1",
+    "pg": "^8.13.1",
+    "sequelize": "^6.37.4"
+  }
+}
