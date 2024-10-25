@@ -1,1 +1,1 @@
-# Travelling-Booking-API
+# Hotel-Booking-API
