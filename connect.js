@@ -59,7 +59,7 @@ User.init(
       allowNull: false,
     },
     role: {
-      type: DataTypes.ENUM("TRAVELER", "MANAGER"),
+      type: DataTypes.ENUM("TRAVELER", "HOTEL_MANAGER"),
       allowNull: false,
     },
     created_at: {

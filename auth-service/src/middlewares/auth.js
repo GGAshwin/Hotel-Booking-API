@@ -1,11 +1,23 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
+const { JWT_SECRET } = require("../constant");
 
 const verifyToken = (req, res, next) => {
-  const token = req.headers['authorization'];
-  if (!token) return res.status(403).json({ error: 'No token provided' });
+  // will the token be sent in auth headers or req body??
+  // confirm with java
+  const tokenFromHeader = req.headers["authorization"];
+  const { token } = req.body;
+  let tokenToBeUsed;
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    if (err) return res.status(401).json({ error: 'Invalid token' });
+  if (token === false) {
+    if (tokenFromHeader === false) {
+      return res.status(403).json({ error: "No token provided" });
+    }
+  }
+
+  tokenToBeUsed = token ? token : tokenFromHeader.split(' ')[1];;
+
+  jwt.verify(tokenToBeUsed, JWT_SECRET, (err, decoded) => {
+    if (err) return res.status(401).json({ error: "Invalid token" });
     req.user = decoded;
     next();
   });

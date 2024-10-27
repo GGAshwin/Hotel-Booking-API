@@ -1,10 +1,11 @@
-require('dotenv').config();
-const jwt = require('jsonwebtoken')
+require("dotenv").config();
+const jwt = require("jsonwebtoken");
 const express = require("express");
 const { connectAndSync, User } = require("../../../connect");
 const router = express.Router();
 const bcrypt = require("bcrypt");
-const { JWT_SECRET } = require('../constant');
+const { JWT_SECRET } = require("../constant");
+const verifyToken = require("../middlewares/auth");
 
 connectAndSync();
 
@@ -58,7 +59,6 @@ router.post("/register", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   try {
-    
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -70,22 +70,34 @@ router.post("/login", async (req, res) => {
     const existingUser = await User.findOne({ where: { email } });
     if (!existingUser) {
       return res.status(400).json({ error: "User not found" });
-    }    
+    }
 
     const isMatch = await existingUser.comparePassword(password);
-    if (!isMatch) return res.status(401).json({ error: 'Invalid credentials' });
+    if (!isMatch) return res.status(401).json({ error: "Invalid credentials" });
 
-    const token = jwt.sign({ user_id: existingUser.user_id, role: existingUser.role }, JWT_SECRET, {
-      expiresIn: '1h',
-    });
+    const token = jwt.sign(
+      { user_id: existingUser.user_id, role: existingUser.role },
+      JWT_SECRET,
+      {
+        expiresIn: "1h",
+      }
+    );
 
-    console.log('here');
+    console.log("here");
 
     res.status(200).json({ token });
-    
-  } catch (error) {
-    
-  }
+  } catch (error) {}
+});
+
+router.post("/verify", verifyToken, async (req, res) => {
+
+  res
+    .status(200)
+    .json({
+      isValid: true,
+      userId: req.user.user_id,
+      role: req.user.role,
+    });
 });
 
 module.exports = router;
