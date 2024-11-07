@@ -1,7 +1,7 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const express = require("express");
-const { connectAndSync, User } = require("../../../connect");
+const { connectAndSync, User } = require("../../../../connect");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const { JWT_SECRET } = require("../constant");
@@ -90,14 +90,11 @@ router.post("/login", async (req, res) => {
 });
 
 router.post("/verify", verifyToken, async (req, res) => {
-
-  res
-    .status(200)
-    .json({
-      isValid: true,
-      userId: req.user.user_id,
-      role: req.user.role,
-    });
+  res.status(200).json({
+    isValid: true,
+    userId: req.user.user_id,
+    role: req.user.role,
+  });
 });
 
 module.exports = router;

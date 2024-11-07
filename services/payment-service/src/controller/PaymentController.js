@@ -1,5 +1,5 @@
 const express = require("express");
-const { connectAndSync, Payment, User } = require("../../../connect");
+const { connectAndSync, Payment, User } = require("../../../../connect");
 const router = express.Router();
 
 connectAndSync();
@@ -51,13 +51,13 @@ router.get("/:id", async (req, res) => {
       ? 200
       : statusCode;
 
-//   if (status === "IN_PROGRESS") {
-//     statusCode = 202;
-//   } else if (status === "FAILED") {
-//     statusCode = 200;
-//   } else if (status === "COMPLETED") {
-//     statusCode = 200;
-//   }
+  //   if (status === "IN_PROGRESS") {
+  //     statusCode = 202;
+  //   } else if (status === "FAILED") {
+  //     statusCode = 200;
+  //   } else if (status === "COMPLETED") {
+  //     statusCode = 200;
+  //   }
 
   res.status(statusCode).json({
     payment_id: existingPayment.payment_id,
@@ -67,5 +67,21 @@ router.get("/:id", async (req, res) => {
     created_at: existingPayment.created_at,
   });
 });
+
+router.get("/:id/status", async (req, res) => {
+  const payment_id = req.params.id;
+
+  const existingPayment = await Payment.findByPk(payment_id);
+  if (!existingPayment) {
+    res.status(404).json({ error: "Payment not found" });
+  }
+
+  res.status(200).json({
+    payment_id: existingPayment.payment_id,
+    status: existingPayment.status,
+  });
+});
+
+function dummyPaymentProcess() {}
 
 module.exports = router;
