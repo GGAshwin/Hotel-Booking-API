@@ -22,6 +22,8 @@ router.post("/", async (req, res) => {
       status: "IN_PROGRESS",
     });
 
+    dummyPaymentProcess(newPayment);
+
     res.status(201).json({
       payment_id: newPayment.payment_id,
       amount: newPayment.amount,
@@ -82,6 +84,14 @@ router.get("/:id/status", async (req, res) => {
   });
 });
 
-function dummyPaymentProcess() {}
+async function dummyPaymentProcess(paymetObj) {
+  const existingPayment = await Payment.findByPk(paymetObj.payment_id);
+  setTimeout(() => {
+    existingPayment.status =
+      Math.floor(Math.random() * 5) === 0 ? "FAILED" : "COMPLETED";
+
+    existingPayment.save();
+  }, 5000);
+}
 
 module.exports = router;
