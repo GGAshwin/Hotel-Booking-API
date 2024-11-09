@@ -10,6 +10,18 @@ const router = express.Router();
 
 connectAndSync();
 
+// get all payments status
+router.get("/status", async (req, res) => {
+  let allPayments = await Payment.findAll({
+    attributes: ["payment_id", "traveler_id", "status"],
+  });
+
+  res.status(200).json({
+    allPayments,
+  });
+});
+
+// make a payment
 router.post("/", async (req, res) => {
   const { booking_id, user_id, amount, payment_method } = req.body;
 
@@ -21,7 +33,6 @@ router.post("/", async (req, res) => {
       type: QueryTypes.SELECT,
     }
   );
-  //   same check for booking table
 
   if (!existingUser) {
     res.status(400).json({ error: "User does not exist" });
@@ -54,6 +65,7 @@ router.post("/", async (req, res) => {
   }
 });
 
+// get specific payment
 router.get("/:id", async (req, res) => {
   const payment_id = req.params.id;
 
@@ -61,6 +73,7 @@ router.get("/:id", async (req, res) => {
 
   if (!existingPayment) {
     res.status(404).json({ error: "Payment not found" });
+    return;
   }
 
   const status = existingPayment.status;
@@ -88,12 +101,14 @@ router.get("/:id", async (req, res) => {
   });
 });
 
+// get status of specific payment
 router.get("/:id/status", async (req, res) => {
   const payment_id = req.params.id;
 
   const existingPayment = await Payment.findByPk(payment_id);
   if (!existingPayment) {
     res.status(404).json({ error: "Payment not found" });
+    return;
   }
 
   res.status(200).json({
@@ -102,6 +117,12 @@ router.get("/:id/status", async (req, res) => {
   });
 });
 
+// get payments of a specific traveler
+router.get("/payments/traveler/:traveler_id", async (req, res) => {});
+
+// retry a specific FAILED payment
+router.post("/payments/:id/retry", async (req, res) => {});
+
 async function dummyPaymentProcess(paymetObj) {
   const existingPayment = await Payment.findByPk(paymetObj.payment_id);
   setTimeout(() => {
@@ -109,7 +130,7 @@ async function dummyPaymentProcess(paymetObj) {
       Math.floor(Math.random() * 5) === 0 ? "FAILED" : "COMPLETED";
 
     existingPayment.save();
-  }, 5000);
+  }, 10000);
 }
 
 module.exports = router;
