@@ -1,5 +1,11 @@
 const express = require("express");
-const { connectAndSync, Payment, User } = require("../../../../connect");
+const {
+  connectAndSync,
+  Payment,
+  User,
+  sequelize,
+} = require("../../../../connect");
+const { QueryTypes } = require("sequelize");
 const router = express.Router();
 
 connectAndSync();
@@ -8,14 +14,25 @@ router.post("/", async (req, res) => {
   const { booking_id, user_id, amount, payment_method } = req.body;
 
   const existingUser = await User.findOne({ where: { user_id } });
+  const existingBooking = await sequelize.query(
+    "SELECT * from booking where id = ?",
+    {
+      replacements: [booking_id],
+      type: QueryTypes.SELECT,
+    }
+  );
   //   same check for booking table
 
   if (!existingUser) {
     res.status(400).json({ error: "User does not exist" });
   }
+  if (!existingBooking) {
+    res.status(400).json({ error: "Booking does not exist" });
+  }
 
   try {
     const newPayment = await Payment.create({
+      booking_id: booking_id,
       traveler_id: user_id,
       amount,
       payment_method,
@@ -25,6 +42,7 @@ router.post("/", async (req, res) => {
     dummyPaymentProcess(newPayment);
 
     res.status(201).json({
+      booking_id: newPayment.booking_id,
       payment_id: newPayment.payment_id,
       amount: newPayment.amount,
       payment_method: newPayment.payment_method,

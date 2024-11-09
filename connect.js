@@ -100,15 +100,14 @@ Payment.init(
       allowNull: false,
       unique: true,
     },
-    // user later once booking service is ready
-    // booking_id: {
-    //   type: DataTypes.UUID,
-    //   allowNull: false,
-    //   references: {
-    //     model: 'Bookings', // Assumes a `Bookings` table/model exists
-    //     key: 'booking_id',
-    //   },
-    // },
+    booking_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "booking",
+        key: "id",
+      },
+    },
     traveler_id: {
       type: DataTypes.UUID,
       allowNull: false,
