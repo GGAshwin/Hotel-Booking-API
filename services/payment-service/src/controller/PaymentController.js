@@ -118,10 +118,41 @@ router.get("/:id/status", async (req, res) => {
 });
 
 // get payments of a specific traveler
-router.get("/payments/traveler/:traveler_id", async (req, res) => {});
+router.get("/traveler/:traveler_id", async (req, res) => {
+  const traveler_id = req.params.traveler_id;
+
+  const traveler = await User.findByPk(traveler_id);
+  if (!traveler) {
+    res.status(404).json({ error: "Traveler Not Found!" });
+    return;
+  }
+
+  const travelerPayments = await Payment.findAll({
+    attributes: [traveler_id],
+  });
+
+  if (!travelerPayments) {
+    res.status(404).json({ error: "Payment not found" });
+    return;
+  }
+
+  res.status(200).json({
+    travelerPayments,
+  });
+});
 
 // retry a specific FAILED payment
-router.post("/payments/:id/retry", async (req, res) => {});
+router.post("/:id/retry", async (req, res) => {
+  const payment_id = req.params.id;
+  const existingPayment = await Payment.findByPk(payment_id);
+
+  if (!existingPayment) {
+    res.status(404).json({ error: "Payment not Found" });
+    return;
+  }
+
+  dummyPaymentProcess(existingPayment);
+});
 
 async function dummyPaymentProcess(paymetObj) {
   const existingPayment = await Payment.findByPk(paymetObj.payment_id);
