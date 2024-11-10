@@ -25,6 +25,7 @@ async function connectAndSync() {
     // You can call sync on your models here if you want
     // await User.sync({ alter: true });
     // await Payment.sync({ alter: true });
+    await Feedback.sync({ alter: true });
   } catch (error) {
     console.error("Unable to connect to the database:", error);
   }
@@ -148,6 +149,63 @@ Payment.init(
     modelName: "Payment",
     tableName: "payments",
     timestamps: false,
+  }
+);
+
+class Feedback extends Model {}
+
+Feedback.init(
+  {
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+      allowNull: false,
+    },
+    hotel_id: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      references: {
+        model: "hotel", // The name of the table in the database
+        key: "id",
+      },
+    },
+    traveler_id: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: {
+        model: "users", // The name of the table in the database
+        key: "user_id",
+      },
+    },
+    comments: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    rating: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: {
+        min: 1,
+        max: 5,
+      },
+    },
+    created_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+      allowNull: false,
+    },
+    updated_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+      allowNull: false,
+    },
+  },
+  {
+    sequelize, // Pass the connection instance
+    modelName: "Feedback",
+    tableName: "Feedback",
+    timestamps: false, // Disable Sequelize's automatic timestamp handling
   }
 );
 
