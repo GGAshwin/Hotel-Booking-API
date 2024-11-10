@@ -25,7 +25,7 @@ async function connectAndSync() {
     // You can call sync on your models here if you want
     // await User.sync({ alter: true });
     // await Payment.sync({ alter: true });
-    await Feedback.sync({ alter: true });
+    // await Feedback.sync({ alter: true });
   } catch (error) {
     console.error("Unable to connect to the database:", error);
   }
