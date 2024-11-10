@@ -1,22 +1,43 @@
 const express = require("express");
-const { connectAndSync, Feedback, User, sequelize } = require("../../../../connect");
+const axios = require("axios"); // For calling external APIs
+const { connectAndSync, Feedback, sequelize } = require("../../../../connect");
 const { QueryTypes } = require("sequelize");
 const router = express.Router();
 
 connectAndSync();
 
-// Add feedback for a hotel
+// Environment variable for auth service URL
+const AUTH_SERVICE_URL = "http://localhost:3000/auth";
+
+// Middleware to verify user role
+async function verifyUserRole(token, expectedRole) {
+  try {
+    const verifyResponse = await axios.post(
+      `${AUTH_SERVICE_URL}/verify`,
+      {},
+      {
+        headers: { Authorization: `Bearer ${token}` }
+      }
+    );
+    const { role } = verifyResponse.data;
+
+    // Check if the user's role matches the expected role
+    return role === expectedRole;
+  } catch (error) {
+    console.error("Error verifying user role:", error.response?.data || error);
+    return false;
+  }
+}
+
+// Add feedback for a hotel (only for users with role: TRAVELER)
 router.post("/", async (req, res) => {
   const { hotel_id, traveler_id, comments, rating } = req.body;
+  const token = req.headers.authorization?.split(" ")[1];
 
-  // Log the incoming request data
-  console.log("Received feedback data:", { hotel_id, traveler_id, comments, rating });
-
-  // Check if traveler exists
-  const traveler = await User.findByPk(traveler_id);
-  if (!traveler || traveler.role !== "TRAVELER") {
-    console.log(`Traveler with ID ${traveler_id} not found or invalid role.`);
-    return res.status(400).json({ error: "Invalid traveler ID" });
+  // Verify the user role as TRAVELER
+  const isTraveler = await verifyUserRole(token, "TRAVELER");
+  if (!isTraveler) {
+    return res.status(403).json({ error: "Only users with the role of TRAVELER can give feedback" });
   }
 
   // Check if hotel exists
@@ -29,8 +50,16 @@ router.post("/", async (req, res) => {
   );
 
   if (!existingHotel.length) {
-    console.log(`Hotel with ID ${hotel_id} not found.`);
     return res.status(400).json({ error: "Hotel not found" });
+  }
+
+  // Check if feedback already exists for the traveler and hotel
+  const existingFeedback = await Feedback.findOne({
+    where: { hotel_id, traveler_id },
+  });
+
+  if (existingFeedback) {
+    return res.status(400).json({ error: "Feedback already exists for this traveler and hotel" });
   }
 
   try {
@@ -40,13 +69,8 @@ router.post("/", async (req, res) => {
       comments,
       rating,
     });
-
-    // Log the created feedback data
-    console.log("Feedback created:", feedback);
-
     res.status(201).json(feedback);
   } catch (error) {
-    console.error("Error creating feedback:", error);
     res.status(500).json({ error: "Failed to add feedback", details: error });
   }
 });
@@ -65,7 +89,6 @@ router.get("/:hotel_id", async (req, res) => {
   );
 
   if (!existingHotel.length) {
-    console.log(`Hotel with ID ${hotel_id} not found.`);
     return res.status(404).json({ error: "Hotel not found" });
   }
 
@@ -76,52 +99,36 @@ router.get("/:hotel_id", async (req, res) => {
       order: [["created_at", "DESC"]],
     });
 
-    // Log the retrieved feedbacks
-    console.log("Retrieved feedbacks:", feedbacks);
+    if (feedbacks.length === 0) {
+      return res.status(200).json({ message: "No feedback available for this hotel" });
+    }
 
     res.status(200).json(feedbacks);
   } catch (error) {
-    console.error("Error retrieving feedbacks:", error);
     res.status(500).json({ error: "Failed to retrieve feedback", details: error });
   }
 });
 
-// Get feedback by ID
-router.get("/feedback/:id", async (req, res) => {
-  const id = req.params.id;
-
-  try {
-    const feedback = await Feedback.findByPk(id);
-    if (!feedback) {
-      console.log(`Feedback with ID ${id} not found.`);
-      return res.status(404).json({ error: "Feedback not found" });
-    }
-
-    // Log the retrieved feedback
-    console.log("Retrieved feedback:", feedback);
-
-    res.status(200).json(feedback);
-  } catch (error) {
-    console.error("Error retrieving feedback:", error);
-    res.status(500).json({ error: "Failed to retrieve feedback", details: error });
-  }
-});
-
-// Delete feedback by ID
+// Delete feedback by ID (Only HOTEL_MANAGER can delete)
 router.delete("/:id", async (req, res) => {
+  const token = req.headers.authorization?.split(" ")[1];
+
+  // Verify the user role as HOTEL_MANAGER
+  const isHotelManager = await verifyUserRole(token, "HOTEL_MANAGER");
+  if (!isHotelManager) {
+    return res.status(403).json({ error: "Only users with the role of HOTEL_MANAGER can delete feedback" });
+  }
+
   const id = req.params.id;
 
   try {
     const result = await Feedback.destroy({ where: { id } });
     if (result) {
-      console.log(`Feedback with ID ${id} deleted successfully.`);
       res.status(200).json({ message: "Feedback deleted successfully" });
     } else {
-      console.log(`Feedback with ID ${id} not found.`);
       res.status(404).json({ error: "Feedback not found" });
     }
   } catch (error) {
-    console.error("Error deleting feedback:", error);
     res.status(500).json({ error: "Failed to delete feedback", details: error });
   }
 });
