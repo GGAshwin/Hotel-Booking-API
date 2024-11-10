@@ -155,7 +155,24 @@ router.post("/:id/retry", async (req, res) => {
     res.status(404).json({ error: "Payment not Found" });
     return;
   }
+
+  if (existingPayment.status !== "FAILED") {
+    res.status(409).json({
+      error: "Payment cannot be retried as it is not in a failed state.",
+      current_status: existingPayment.status,
+    });
+    return;
+  }
+
+  existingPayment.status = "IN_PROGRESS";
+  existingPayment.save();
   dummyPaymentProcess(existingPayment);
+
+  res.status(201).json({
+    message: "Retry Initiated",
+    payment_id: existingPayment.payment_id,
+    status: existingPayment.status,
+  });
 });
 
 async function dummyPaymentProcess(paymetObj) {
