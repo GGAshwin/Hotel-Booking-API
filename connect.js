@@ -204,9 +204,9 @@ Feedback.init(
   {
     sequelize, // Pass the connection instance
     modelName: "Feedback",
-    tableName: "Feedback",
+    tableName: "feedback",
     timestamps: false, // Disable Sequelize's automatic timestamp handling
   }
 );
 
-module.exports = { connectAndSync, sequelize, User, Payment };
+module.exports = { connectAndSync, sequelize, User, Payment, Feedback };
