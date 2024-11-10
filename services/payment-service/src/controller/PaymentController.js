@@ -119,6 +119,8 @@ router.get("/:id/status", async (req, res) => {
 
 // get payments of a specific traveler
 router.get("/traveler/:traveler_id", async (req, res) => {
+  console.log("here----------------");
+
   const traveler_id = req.params.traveler_id;
 
   const traveler = await User.findByPk(traveler_id);
@@ -128,8 +130,11 @@ router.get("/traveler/:traveler_id", async (req, res) => {
   }
 
   const travelerPayments = await Payment.findAll({
-    attributes: [traveler_id],
+    where: { traveler_id: traveler_id },
+    attributes: ["payment_id", "booking_id", "amount", "status", "created_at"],
   });
+
+  console.log(travelerPayments);
 
   if (!travelerPayments) {
     res.status(404).json({ error: "Payment not found" });
@@ -150,7 +155,6 @@ router.post("/:id/retry", async (req, res) => {
     res.status(404).json({ error: "Payment not Found" });
     return;
   }
-
   dummyPaymentProcess(existingPayment);
 });
 
