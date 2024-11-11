@@ -12,19 +12,27 @@ const AUTH_SERVICE_URL = "http://localhost:3000/auth";
 // Middleware to verify user role
 async function verifyUserRole(token, expectedRole) {
   try {
+    // Ensure the token is being passed properly
+    if (!token) {
+      throw new Error("Token is missing");
+    }
+
     const verifyResponse = await axios.post(
       `${AUTH_SERVICE_URL}/verify`,
       {},
       {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       }
     );
     const { role } = verifyResponse.data;
 
-    // Check if the user's role matches the expected role
-    return role === expectedRole;
+    // Ensure role matches the expected role
+    if (role !== expectedRole) {
+      throw new Error(`Expected role ${expectedRole}, but got ${role}`);
+    }
+    return true;
   } catch (error) {
-    console.error("Error verifying user role:", error.response?.data || error);
+    console.error("Error verifying user role:", error.message || error);
     return false;
   }
 }
@@ -32,12 +40,15 @@ async function verifyUserRole(token, expectedRole) {
 // Add feedback for a hotel (only for users with role: TRAVELER)
 router.post("/", async (req, res) => {
   const { hotel_id, traveler_id, comments, rating } = req.body;
-  const token = req.headers.authorization?.split(" ")[1];
+  const token = req.headers.authorization?.split(" ")[1];  // Assuming Bearer token
 
   // Verify the user role as TRAVELER
   const isTraveler = await verifyUserRole(token, "TRAVELER");
+
   if (!isTraveler) {
-    return res.status(403).json({ error: "Only users with the role of TRAVELER can give feedback" });
+    return res.status(403).json({
+      error: "Only users with the role of TRAVELER can give feedback",
+    });
   }
 
   // Check if hotel exists
@@ -59,7 +70,9 @@ router.post("/", async (req, res) => {
   });
 
   if (existingFeedback) {
-    return res.status(400).json({ error: "Feedback already exists for this traveler and hotel" });
+    return res.status(400).json({
+      error: "Feedback already exists for this traveler and hotel",
+    });
   }
 
   try {
@@ -100,7 +113,9 @@ router.get("/:hotel_id", async (req, res) => {
     });
 
     if (feedbacks.length === 0) {
-      return res.status(200).json({ message: "No feedback available for this hotel" });
+      return res
+        .status(200)
+        .json({ message: "No feedback available for this hotel" });
     }
 
     res.status(200).json(feedbacks);
@@ -116,7 +131,9 @@ router.delete("/:id", async (req, res) => {
   // Verify the user role as HOTEL_MANAGER
   const isHotelManager = await verifyUserRole(token, "HOTEL_MANAGER");
   if (!isHotelManager) {
-    return res.status(403).json({ error: "Only users with the role of HOTEL_MANAGER can delete feedback" });
+    return res.status(403).json({
+      error: "Only users with the role of HOTEL_MANAGER can delete feedback",
+    });
   }
 
   const id = req.params.id;
