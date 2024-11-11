@@ -209,4 +209,4 @@ Feedback.init(
   }
 );
 
-module.exports = { connectAndSync, sequelize, User, Payment };
+module.exports = { connectAndSync, sequelize, User, Payment, Feedback };
