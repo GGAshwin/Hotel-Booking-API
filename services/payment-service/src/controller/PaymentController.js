@@ -86,14 +86,6 @@ router.get("/:id", async (req, res) => {
       ? 200
       : statusCode;
 
-  //   if (status === "IN_PROGRESS") {
-  //     statusCode = 202;
-  //   } else if (status === "FAILED") {
-  //     statusCode = 200;
-  //   } else if (status === "COMPLETED") {
-  //     statusCode = 200;
-  //   }
-
   res.status(statusCode).json({
     payment_id: existingPayment.payment_id,
     amount: existingPayment.amount,
@@ -121,8 +113,6 @@ router.get("/:id/status", async (req, res) => {
 
 // get payments of a specific traveler
 router.get("/traveler/:traveler_id", async (req, res) => {
-  console.log("here----------------");
-
   const traveler_id = req.params.traveler_id;
 
   const traveler = await User.findByPk(traveler_id);
