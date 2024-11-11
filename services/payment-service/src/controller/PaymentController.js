@@ -36,7 +36,7 @@ router.post("/", async (req, res) => {
 
   if (!existingUser) {
     res.status(400).json({ error: "User does not exist" });
-    return
+    return;
   }
   if (!existingBooking) {
     res.status(400).json({ error: "Booking does not exist" });

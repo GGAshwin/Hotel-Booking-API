@@ -40,7 +40,7 @@ async function verifyUserRole(token, expectedRole) {
 // Add feedback for a hotel (only for users with role: TRAVELER)
 router.post("/", async (req, res) => {
   const { hotel_id, traveler_id, comments, rating } = req.body;
-  const token = req.headers.authorization?.split(" ")[1];  // Assuming Bearer token
+  const token = req.headers.authorization?.split(" ")[1]; // Assuming Bearer token
 
   // Verify the user role as TRAVELER
   const isTraveler = await verifyUserRole(token, "TRAVELER");
@@ -120,7 +120,9 @@ router.get("/:hotel_id", async (req, res) => {
 
     res.status(200).json(feedbacks);
   } catch (error) {
-    res.status(500).json({ error: "Failed to retrieve feedback", details: error });
+    res
+      .status(500)
+      .json({ error: "Failed to retrieve feedback", details: error });
   }
 });
 
@@ -146,7 +148,9 @@ router.delete("/:id", async (req, res) => {
       res.status(404).json({ error: "Feedback not found" });
     }
   } catch (error) {
-    res.status(500).json({ error: "Failed to delete feedback", details: error });
+    res
+      .status(500)
+      .json({ error: "Failed to delete feedback", details: error });
   }
 });
 
