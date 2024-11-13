@@ -7,7 +7,7 @@ require("dotenv").config();
 app.use(express.json());
 
 app.use("/auth", AuthController);
-app.use("/users", UserController);
+app.use("/api/users", UserController);
 
 app.get("/health", (req, res) => {
   res.json({ health: "ok" });
