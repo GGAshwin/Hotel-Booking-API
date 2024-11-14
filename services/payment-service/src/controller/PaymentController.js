@@ -1,5 +1,5 @@
 const express = require("express");
-const { connectAndSync, Payment, User, sequelize } = require("../../connect");
+const { connectAndSync, Payment, sequelize } = require("../../connect");
 const { QueryTypes } = require("sequelize");
 const router = express.Router();
 const Joi = require("joi");
