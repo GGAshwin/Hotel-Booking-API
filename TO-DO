@@ -1,2 +1,5 @@
 feedback table must not have the same traveler rating for same hotel more than once
 include HATEOAS in some way
+
+Need to replace booking db calls with booking service calls in payment service
+If only manager is allowed to query for user, how do i call the user service internally?

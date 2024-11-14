@@ -39,12 +39,13 @@ router.put("/:user_id", verifyToken, async (req, res) => {
 });
 
 // Get user profile
-router.get("/:user_id", verifyToken, async (req, res) => {
+router.get("/:user_id", async (req, res) => {
   try {
     const { user_id } = req.params;
-    if (req.user.user_id !== user_id && req.user.role !== 'HOTEL_MANAGER') {
-      return res.status(403).json({ error: "Unauthorized access" });
-    }
+    // NEED TO DISCUSS ON THIS
+    // if (req.user.user_id !== user_id && req.user.role !== 'HOTEL_MANAGER') {
+    //   return res.status(403).json({ error: "Unauthorized access" });
+    // }
 
     const user = await User.findByPk(user_id, {
       attributes: ['user_id', 'first_name', 'last_name', 'email', 'role']
