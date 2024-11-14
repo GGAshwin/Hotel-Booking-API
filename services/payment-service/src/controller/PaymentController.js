@@ -4,7 +4,7 @@ const {
   Payment,
   User,
   sequelize,
-} = require("../../../../connect");
+} = require("../../connect");
 const { QueryTypes } = require("sequelize");
 const router = express.Router();
 

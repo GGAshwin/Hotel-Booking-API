@@ -1,6 +1,6 @@
 const express = require("express");
 const axios = require("axios"); // For calling external APIs
-const { connectAndSync, Feedback, sequelize } = require("../../../../connect");
+const { connectAndSync, Feedback, sequelize } = require("../../connect");
 const { QueryTypes } = require("sequelize");
 const router = express.Router();
 
