@@ -1,7 +1,7 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const express = require("express");
-const { connectAndSync, User } = require("../../../../connect");
+const { connectAndSync, User } = require("../../connect");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const { JWT_SECRET } = require("../constant");

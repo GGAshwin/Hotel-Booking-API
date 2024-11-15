@@ -1,12 +1,10 @@
 const express = require("express");
-const {
-  connectAndSync,
-  Payment,
-  User,
-  sequelize,
-} = require("../../../../connect");
+const { connectAndSync, Payment, sequelize } = require("../../connect");
 const { QueryTypes } = require("sequelize");
 const router = express.Router();
+const Joi = require("joi");
+const axios = require("axios");
+const USER_BASE_URL = "http://localhost:3000/api/users";
 
 connectAndSync();
 
@@ -25,23 +23,36 @@ router.get("/status", async (req, res) => {
 router.post("/", async (req, res) => {
   const { booking_id, user_id, amount, payment_method } = req.body;
 
-  const existingUser = await User.findOne({ where: { user_id } });
-  const existingBooking = await sequelize.query(
-    "SELECT * from booking where id = ?",
-    {
-      replacements: [booking_id],
-      type: QueryTypes.SELECT,
-    }
-  );
+  const paymentSchema = Joi.object({
+    booking_id: Joi.string().required(),
+    user_id: Joi.string().required(),
+    amount: Joi.number().positive().required(),
+    payment_method: Joi.string().valid("CREDIT", "UPI").required(),
+  });
+
+  const { error } = paymentSchema.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({ error: error.details[0].message });
+  }
+
+  // const existingUser = await User.findOne({ where: { user_id } });
+  // const existingBooking = await sequelize.query(
+  // make call to user service
+  let existingUser;
+
+  const userData = await axios.get(`${USER_BASE_URL}/${user_id}`);
+
+  existingUser = userData.data.user;
 
   if (!existingUser) {
     res.status(400).json({ error: "User does not exist" });
-    return
-  }
-  if (!existingBooking) {
-    res.status(400).json({ error: "Booking does not exist" });
     return;
   }
+  // if (!existingBooking) {
+  //   res.status(400).json({ error: "Booking does not exist" });
+  //   return;
+  // }
 
   try {
     const newPayment = await Payment.create({
@@ -86,14 +97,6 @@ router.get("/:id", async (req, res) => {
       ? 200
       : statusCode;
 
-  //   if (status === "IN_PROGRESS") {
-  //     statusCode = 202;
-  //   } else if (status === "FAILED") {
-  //     statusCode = 200;
-  //   } else if (status === "COMPLETED") {
-  //     statusCode = 200;
-  //   }
-
   res.status(statusCode).json({
     payment_id: existingPayment.payment_id,
     amount: existingPayment.amount,
@@ -121,12 +124,11 @@ router.get("/:id/status", async (req, res) => {
 
 // get payments of a specific traveler
 router.get("/traveler/:traveler_id", async (req, res) => {
-  console.log("here----------------");
-
   const traveler_id = req.params.traveler_id;
 
-  const traveler = await User.findByPk(traveler_id);
-  if (!traveler) {
+  const traveler = await axios.get(`${USER_BASE_URL}/${traveler_id}`);
+  // const traveler = await User.findByPk(traveler_id);
+  if (!traveler.data.user) {
     res.status(404).json({ error: "Traveler Not Found!" });
     return;
   }
@@ -151,6 +153,7 @@ router.get("/traveler/:traveler_id", async (req, res) => {
 // retry a specific FAILED payment
 router.post("/:id/retry", async (req, res) => {
   const payment_id = req.params.id;
+  
   const existingPayment = await Payment.findByPk(payment_id);
 
   if (!existingPayment) {

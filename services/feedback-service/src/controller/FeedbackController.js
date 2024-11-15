@@ -1,6 +1,6 @@
 const express = require("express");
-const axios = require("axios");
-const { connectAndSync, Feedback, sequelize } = require("../../../../connect");
+const axios = require("axios"); // For calling external APIs
+const { connectAndSync, Feedback, sequelize } = require("../../connect");
 const { QueryTypes } = require("sequelize");
 const router = express.Router();
 
@@ -37,7 +37,7 @@ async function verifyUserRole(token, expectedRole) {
 // Add feedback for a hotel (only for users with role: TRAVELER)
 router.post("/", async (req, res) => {
   const { hotel_id, traveler_id, comments, rating } = req.body;
-  const token = req.headers.authorization?.split(" ")[1];
+  const token = req.headers.authorization?.split(" ")[1]; // Assuming Bearer token
 
   const isTraveler = await verifyUserRole(token, "TRAVELER");
 
@@ -118,7 +118,9 @@ router.get("/:hotel_id", async (req, res) => {
 
     res.status(200).json(feedbacks);
   } catch (error) {
-    res.status(500).json({ error: "Failed to retrieve feedback", details: error });
+    res
+      .status(500)
+      .json({ error: "Failed to retrieve feedback", details: error });
   }
 });
 
@@ -143,7 +145,9 @@ router.delete("/:id", async (req, res) => {
       res.status(404).json({ error: "Feedback not found" });
     }
   } catch (error) {
-    res.status(500).json({ error: "Failed to delete feedback", details: error });
+    res
+      .status(500)
+      .json({ error: "Failed to delete feedback", details: error });
   }
 });
 
