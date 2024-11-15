@@ -1,18 +1,16 @@
 const express = require("express");
-const axios = require("axios"); // For calling external APIs
+const axios = require("axios");
 const { connectAndSync, Feedback, sequelize } = require("../../../../connect");
 const { QueryTypes } = require("sequelize");
 const router = express.Router();
 
 connectAndSync();
 
-// Environment variable for auth service URL
 const AUTH_SERVICE_URL = "http://localhost:3000/auth";
 
 // Middleware to verify user role
 async function verifyUserRole(token, expectedRole) {
   try {
-    // Ensure the token is being passed properly
     if (!token) {
       throw new Error("Token is missing");
     }
@@ -26,7 +24,6 @@ async function verifyUserRole(token, expectedRole) {
     );
     const { role } = verifyResponse.data;
 
-    // Ensure role matches the expected role
     if (role !== expectedRole) {
       throw new Error(`Expected role ${expectedRole}, but got ${role}`);
     }
@@ -40,9 +37,8 @@ async function verifyUserRole(token, expectedRole) {
 // Add feedback for a hotel (only for users with role: TRAVELER)
 router.post("/", async (req, res) => {
   const { hotel_id, traveler_id, comments, rating } = req.body;
-  const token = req.headers.authorization?.split(" ")[1];  // Assuming Bearer token
+  const token = req.headers.authorization?.split(" ")[1];
 
-  // Verify the user role as TRAVELER
   const isTraveler = await verifyUserRole(token, "TRAVELER");
 
   if (!isTraveler) {
@@ -51,7 +47,6 @@ router.post("/", async (req, res) => {
     });
   }
 
-  // Check if hotel exists
   const existingHotel = await sequelize.query(
     "SELECT * FROM hotel WHERE id = ?",
     {
@@ -64,7 +59,6 @@ router.post("/", async (req, res) => {
     return res.status(400).json({ error: "Hotel not found" });
   }
 
-  // Check if feedback already exists for the traveler and hotel
   const existingFeedback = await Feedback.findOne({
     where: { hotel_id, traveler_id },
   });
@@ -88,11 +82,11 @@ router.post("/", async (req, res) => {
   }
 });
 
-// Get all feedback for a specific hotel
+// Get all feedback for a specific hotel with sorting options
 router.get("/:hotel_id", async (req, res) => {
   const hotel_id = req.params.hotel_id;
+  const { sort = "date", order = "desc" } = req.query;
 
-  // Check if hotel exists
   const existingHotel = await sequelize.query(
     "SELECT * FROM hotel WHERE id = ?",
     {
@@ -105,11 +99,15 @@ router.get("/:hotel_id", async (req, res) => {
     return res.status(404).json({ error: "Hotel not found" });
   }
 
+  // Determine the column to sort by and the order direction
+  const orderColumn = sort === "rating" ? "rating" : "created_at";
+  const orderDirection = order.toLowerCase() === "asc" ? "ASC" : "DESC";
+
   try {
     const feedbacks = await Feedback.findAll({
       where: { hotel_id },
       attributes: ["id", "traveler_id", "comments", "rating", "created_at"],
-      order: [["created_at", "DESC"]],
+      order: [[orderColumn, orderDirection]], // Order by date (created_at) or rating as specified
     });
 
     if (feedbacks.length === 0) {
@@ -128,7 +126,6 @@ router.get("/:hotel_id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   const token = req.headers.authorization?.split(" ")[1];
 
-  // Verify the user role as HOTEL_MANAGER
   const isHotelManager = await verifyUserRole(token, "HOTEL_MANAGER");
   if (!isHotelManager) {
     return res.status(403).json({
