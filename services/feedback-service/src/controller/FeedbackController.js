@@ -11,6 +11,7 @@ const AUTH_SERVICE_URL = "http://localhost:3000/auth";
 // Middleware to verify user role
 async function verifyUserRole(token, expectedRole) {
   try {
+    // Ensure the token is being passed properly
     if (!token) {
       throw new Error("Token is missing");
     }
@@ -24,6 +25,7 @@ async function verifyUserRole(token, expectedRole) {
     );
     const { role } = verifyResponse.data;
 
+    // Ensure role matches the expected role
     if (role !== expectedRole) {
       throw new Error(`Expected role ${expectedRole}, but got ${role}`);
     }
@@ -48,6 +50,7 @@ router.post("/", async (req, res) => {
     });
   }
 
+  // Check if hotel exists
   const existingHotel = await sequelize.query(
     "SELECT * FROM hotel WHERE id = ?",
     {
