@@ -39,6 +39,7 @@ router.post("/", async (req, res) => {
   const { hotel_id, traveler_id, comments, rating } = req.body;
   const token = req.headers.authorization?.split(" ")[1]; // Assuming Bearer token
 
+  // Verify the user role as TRAVELER
   const isTraveler = await verifyUserRole(token, "TRAVELER");
 
   if (!isTraveler) {
@@ -59,6 +60,7 @@ router.post("/", async (req, res) => {
     return res.status(400).json({ error: "Hotel not found" });
   }
 
+  // Check if feedback already exists for the traveler and hotel
   const existingFeedback = await Feedback.findOne({
     where: { hotel_id, traveler_id },
   });
@@ -95,6 +97,7 @@ router.get("/:hotel_id", async (req, res) => {
     }
   );
 
+  // Check if hotel exists
   if (!existingHotel.length) {
     return res.status(404).json({ error: "Hotel not found" });
   }
@@ -128,6 +131,7 @@ router.get("/:hotel_id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   const token = req.headers.authorization?.split(" ")[1];
 
+  // Verify the user role as HOTEL_MANAGER
   const isHotelManager = await verifyUserRole(token, "HOTEL_MANAGER");
   if (!isHotelManager) {
     return res.status(403).json({
