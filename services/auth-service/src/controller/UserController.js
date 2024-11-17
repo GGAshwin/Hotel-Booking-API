@@ -1,7 +1,7 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { User } = require("../../../../connect");
+const { User } = require("../../connect");
 const verifyToken = require("../middlewares/auth");
 const { JWT_SECRET } = require("../constant");
 
