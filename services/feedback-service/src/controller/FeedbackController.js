@@ -6,7 +6,6 @@ const router = express.Router();
 
 connectAndSync();
 
-// Environment variable for auth service URL
 const AUTH_SERVICE_URL = "http://localhost:3000/auth";
 
 // Middleware to verify user role
@@ -88,11 +87,11 @@ router.post("/", async (req, res) => {
   }
 });
 
-// Get all feedback for a specific hotel
+// Get all feedback for a specific hotel with sorting options
 router.get("/:hotel_id", async (req, res) => {
   const hotel_id = req.params.hotel_id;
+  const { sort = "date", order = "desc" } = req.query;
 
-  // Check if hotel exists
   const existingHotel = await sequelize.query(
     "SELECT * FROM hotel WHERE id = ?",
     {
@@ -101,15 +100,20 @@ router.get("/:hotel_id", async (req, res) => {
     }
   );
 
+  // Check if hotel exists
   if (!existingHotel.length) {
     return res.status(404).json({ error: "Hotel not found" });
   }
+
+  // Determine the column to sort by and the order direction
+  const orderColumn = sort === "rating" ? "rating" : "created_at";
+  const orderDirection = order.toLowerCase() === "asc" ? "ASC" : "DESC";
 
   try {
     const feedbacks = await Feedback.findAll({
       where: { hotel_id },
       attributes: ["id", "traveler_id", "comments", "rating", "created_at"],
-      order: [["created_at", "DESC"]],
+      order: [[orderColumn, orderDirection]], // Order by date (created_at) or rating as specified
     });
 
     if (feedbacks.length === 0) {
