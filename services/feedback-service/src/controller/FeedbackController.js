@@ -7,6 +7,8 @@ const router = express.Router();
 connectAndSync();
 
 const AUTH_SERVICE_URL = "http://localhost:3000/auth";
+// const HOTL_SERVICE_URL = 'https://hotel-service.cfapps.eu12.hana.ondemand.com/hotels/'
+const HOTL_SERVICE_URL = 'http://localhost:8080'
 
 // Middleware to verify user role
 async function verifyUserRole(token, expectedRole) {
@@ -91,14 +93,19 @@ router.post("/", async (req, res) => {
 router.get("/:hotel_id", async (req, res) => {
   const hotel_id = req.params.hotel_id;
   const { sort = "date", order = "desc" } = req.query;
+  // have to generate send the traveler token too
+  let existingHotel = await axios.get(`${HOTL_SERVICE_URL}/hotels/${hotel_id}`);
+  console.log(existingHotel.data);
+  
+  existingHotel = existingHotel.data;
 
-  const existingHotel = await sequelize.query(
-    "SELECT * FROM hotel WHERE id = ?",
-    {
-      replacements: [hotel_id],
-      type: QueryTypes.SELECT,
-    }
-  );
+  // const existingHotel = await sequelize.query(
+  //   "SELECT * FROM hotel WHERE id = ?",
+  //   {
+  //     replacements: [hotel_id],
+  //     type: QueryTypes.SELECT,
+  //   }
+  // );
 
   // Check if hotel exists
   if (!existingHotel.length) {
