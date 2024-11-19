@@ -6,7 +6,7 @@ const bcrypt = require("bcrypt");
 
 // Using the full service URI
 const sequelize = new Sequelize(
-  "postgres://avnadmin:AVNS_PmgRMTaa5tS65ZyUGw8@pg-hotel-service-hotelservice.k.aivencloud.com:19582/Hotel",
+  "postgres://avnadmin:AVNS_xAQ4MVTZ4x-S7tPAIEC@postgres-online-ashwinprabhu2001-fd23.k.aivencloud.com:18505/defaultdb",
   {
     dialect: "postgres",
     dialectOptions: {
@@ -25,7 +25,7 @@ async function connectAndSync() {
     // You can call sync on your models here if you want
     // await User.sync({ alter: true });
     // await Payment.sync({ alter: true });
-    // await Feedback.sync({ alter: true });
+    await Feedback.sync({ alter: true });
   } catch (error) {
     console.error("Unable to connect to the database:", error);
   }
@@ -33,68 +33,6 @@ async function connectAndSync() {
 
 connectAndSync();
 
-
-class Payment extends Model {}
-
-Payment.init(
-  {
-    payment_id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4, // Automatically generate a UUID
-      primaryKey: true,
-      allowNull: false,
-      unique: true,
-    },
-    booking_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: "booking",
-        key: "id",
-      },
-    },
-    traveler_id: {
-      type: DataTypes.UUID,
-      allowNull: false,
-      references: {
-        model: "users",
-        key: "user_id",
-      },
-    },
-    amount: {
-      type: DataTypes.DECIMAL,
-      allowNull: false,
-    },
-    payment_method: {
-      type: DataTypes.STRING(50),
-      allowNull: false,
-      validate: {
-        isIn: [["CREDIT", "UPI"]],
-      },
-    },
-    status: {
-      type: DataTypes.STRING(20),
-      allowNull: false,
-      validate: {
-        isIn: [["COMPLETED", "FAILED", "IN_PROGRESS"]],
-      },
-    },
-    created_at: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
-    },
-    updated_at: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
-    },
-  },
-  {
-    sequelize, // Use the imported sequelize instance
-    modelName: "Payment",
-    tableName: "payments",
-    timestamps: false,
-  }
-);
 
 class Feedback extends Model {}
 
@@ -107,12 +45,8 @@ Feedback.init(
       allowNull: false,
     },
     hotel_id: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.UUID,
       allowNull: false,
-      references: {
-        model: "hotel", // The name of the table in the database
-        key: "id",
-      },
     },
     traveler_id: {
       type: DataTypes.UUID,
