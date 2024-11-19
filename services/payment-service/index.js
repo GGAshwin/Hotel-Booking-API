@@ -13,6 +13,6 @@ app.get("/health", (req, res) => {
   res.json({ health: "ok" });
 });
 
-app.listen(8080, () => {
+app.listen(port, () => {
   console.log(`App runnig in ${environment} listening to port ${port} (PAYMENT SERVICE)`);
 });
