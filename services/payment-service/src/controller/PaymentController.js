@@ -4,6 +4,7 @@ const { QueryTypes } = require("sequelize");
 const router = express.Router();
 const Joi = require("joi");
 const axios = require("axios");
+const { Op } = require("sequelize");
 const USER_BASE_URL = "http://localhost:3000/api/users";
 // logic to generate manager token need to be implemented
 
@@ -64,7 +65,6 @@ router.post("/", async (req, res) => {
       status: newPayment.status,
       created_at: newPayment.created_at,
     });
-
   } catch (err) {
     // Handle Axios errors specifically
     if (err.response) {
@@ -82,6 +82,51 @@ router.post("/", async (req, res) => {
       console.error("Unexpected Error:", err.message);
       return res.status(500).json({ error: "Unexpected server error" });
     }
+  }
+});
+
+router.get("/", async (req, res) => {
+  const {
+    payment_id,
+    traveler_id,
+    status,
+    order_by = "created_at",
+    order = "ASC",
+  } = req.query;
+
+  try {
+    // Construct the search criteria dynamically
+    const whereClause = {};
+    if (payment_id) whereClause.payment_id = payment_id;
+    if (traveler_id) whereClause.traveler_id = traveler_id;
+    if (status) whereClause.status = status;
+
+    // Fetch payments with search and order
+    const payments = await Payment.findAll({
+      where: whereClause,
+      attributes: [
+        "payment_id",
+        "traveler_id",
+        "amount",
+        "payment_method",
+        "status",
+        "created_at",
+      ],
+      order: [[order_by, order.toUpperCase()]],
+    });
+
+    if (!payments || payments.length === 0) {
+      return res
+        .status(404)
+        .json({ error: "No payments found matching the criteria." });
+    }
+
+    res.status(200).json({
+      payments,
+    });
+  } catch (error) {
+    console.error("Error fetching payments:", error);
+    res.status(500).json({ error: "Internal server error." });
   }
 });
 
