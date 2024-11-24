@@ -83,10 +83,10 @@ router.post("/login", async (req, res) => {
       }
     );
 
-    console.log("here");
-
     res.status(200).json({ token });
-  } catch (error) {}
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 router.post("/verify", verifyToken, async (req, res) => {

@@ -7,6 +7,8 @@ const router = express.Router();
 connectAndSync();
 
 const AUTH_SERVICE_URL = "http://localhost:3000/auth";
+// const HOTL_SERVICE_URL = 'https://hotel-service.cfapps.eu12.hana.ondemand.com/hotels/'
+const HOTL_SERVICE_URL = "http://localhost:8080";
 
 // Middleware to verify user role
 async function verifyUserRole(token, expectedRole) {
@@ -36,6 +38,20 @@ async function verifyUserRole(token, expectedRole) {
   }
 }
 
+async function generateUserToken() {
+  try {
+    const traveler_token = await axios.post(`${AUTH_SERVICE_URL}/login`, {
+      email: "service_account.traveler@example.com",
+      password: "service_account_secret",
+    });
+  
+    return traveler_token.data.token;
+  } catch (error) {
+    console.error('User not found');
+    return;
+  }
+}
+
 // Add feedback for a hotel (only for users with role: TRAVELER)
 router.post("/", async (req, res) => {
   const { hotel_id, traveler_id, comments, rating } = req.body;
@@ -51,15 +67,20 @@ router.post("/", async (req, res) => {
   }
 
   // Check if hotel exists
-  const existingHotel = await sequelize.query(
-    "SELECT * FROM hotel WHERE id = ?",
+
+  let existingHotel = await axios.get(
+    `${HOTL_SERVICE_URL}/hotels/${hotel_id}`,
     {
-      replacements: [hotel_id],
-      type: QueryTypes.SELECT,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     }
   );
 
-  if (!existingHotel.length) {
+  console.log(existingHotel);
+  
+
+  if (!existingHotel.data) {
     return res.status(400).json({ error: "Hotel not found" });
   }
 
@@ -87,11 +108,16 @@ router.post("/", async (req, res) => {
   }
 });
 
-// Get all feedback for a specific hotel with sorting options
+// Get all feedback for a specific hotel with sorting options with sorting options
 router.get("/:hotel_id", async (req, res) => {
   const hotel_id = req.params.hotel_id;
   const { sort = "date", order = "desc" } = req.query;
+  // have to generate send the traveler token too
 
+  try {
+    let token_traveler = await generateUserToken();
+
+  // Check if hotel exists
   const existingHotel = await sequelize.query(
     "SELECT * FROM hotel WHERE id = ?",
     {
@@ -100,16 +126,15 @@ router.get("/:hotel_id", async (req, res) => {
     }
   );
 
-  // Check if hotel exists
-  if (!existingHotel.length) {
-    return res.status(404).json({ error: "Hotel not found" });
-  }
+    // Check if hotel exists
+    if (existingHotel.status !== 200 || !existingHotel.data) {
+      return res.status(404).json({ error: "Hotel not found" });
+    }
 
-  // Determine the column to sort by and the order direction
-  const orderColumn = sort === "rating" ? "rating" : "created_at";
-  const orderDirection = order.toLowerCase() === "asc" ? "ASC" : "DESC";
+    // Determine the column to sort by and the order direction
+    const orderColumn = sort === "rating" ? "rating" : "created_at";
+    const orderDirection = order.toLowerCase() === "asc" ? "ASC" : "DESC";
 
-  try {
     const feedbacks = await Feedback.findAll({
       where: { hotel_id },
       attributes: ["id", "traveler_id", "comments", "rating", "created_at"],

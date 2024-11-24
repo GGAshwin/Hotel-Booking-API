@@ -6,7 +6,7 @@ const bcrypt = require("bcrypt");
 
 // Using the full service URI
 const sequelize = new Sequelize(
-  "postgres://avnadmin:AVNS_PmgRMTaa5tS65ZyUGw8@pg-hotel-service-hotelservice.k.aivencloud.com:19582/Hotel",
+  "postgres://avnadmin:AVNS_xAQ4MVTZ4x-S7tPAIEC@postgres-online-ashwinprabhu2001-fd23.k.aivencloud.com:18505/defaultdb",
   {
     dialect: "postgres",
     dialectOptions: {

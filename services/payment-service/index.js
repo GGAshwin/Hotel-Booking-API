@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
 const PaymentController = require('./src/controller/PaymentController')
+const port = process.env.PORT || 3001;
+const environment = process.env.NODE_ENV || 'development';
 require('dotenv').config();
 
 app.use(express.json());
@@ -11,6 +13,6 @@ app.get("/health", (req, res) => {
   res.json({ health: "ok" });
 });
 
-app.listen(3001, () => {
-  console.log("listening to port 3001 (PAYMENT SERVICE)");
+app.listen(port, () => {
+  console.log(`App runnig in ${environment} listening to port ${port} (PAYMENT SERVICE)`);
 });

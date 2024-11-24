@@ -1,0 +1,749 @@
+openapi: 3.0.0
+info:
+  title: Hotel Booking API
+  version: 1.0.0
+  description: API endpoints for authentication, user management, payments, and feedback in the hotel booking system.
+
+paths:
+  /auth/register:
+    post:
+      summary: Register a new user
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                role:
+                  type: string
+                  enum: [TRAVELER, HOTEL_MANAGER]
+              required:
+                - first_name
+                - last_name
+                - email
+                - password
+                - role
+      responses:
+        201:
+          description: User registered successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/User'
+        400:
+          description: Please provide all required fields.
+        500:
+          description: Server error
+
+  /auth/login:
+    post:
+      summary: User login
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - email
+                - password
+      responses:
+        200:
+          description: Login successful, token returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        400:
+          description: Please provide all required fields.
+        401:
+          description: Invalid credential
+        500:
+          description: Server error
+
+  /auth/verify:
+    post:
+      summary: Verify authentication token
+      tags:
+        - Authentication
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Token is valid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isValid:
+                    type: boolean
+                  userId:
+                    type: string
+                  role:
+                    type: string
+        401:
+          description: Invalid token
+        403:
+          description: No token provided
+
+  /api/users/{user_id}:
+    get:
+      summary: Get user profile
+      tags:
+        - User
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: User profile information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        403:
+          description: Unauthorized access
+        404:
+          description: User not found
+        500:
+          description: Server error
+    put:
+      summary: Update user profile
+      tags:
+        - User
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                password:
+                  type: string
+      responses:
+        200:
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        403:
+          description: Unauthorized access
+        404:
+          description: User not found
+        500:
+          description: Server error
+    delete:
+      summary: Delete user account
+      tags:
+        - User
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: User deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User deleted successfully"
+        403:
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Unauthorized access"
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "User not found"
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Server error"
+
+
+  # Payment APIs
+  /api/payments/status:
+    get:
+      summary: Get all payment statuses
+      tags:
+        - Payment
+      responses:
+        200:
+          description: List of all payments with their statuses
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  allPayments:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PaymentStatus'
+        500:
+          description: Server error
+
+  /api/payments:
+    post:
+      summary: Make a payment
+      tags:
+        - Payment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                booking_id:
+                  type: integer
+                user_id:
+                  type: string
+                amount:
+                  type: number
+                  format: float
+                payment_method:
+                  type: string
+                  enum: [CREDIT, UPI]
+              required:
+                - booking_id
+                - user_id
+                - amount
+                - payment_method
+      responses:
+        201:
+          description: Payment created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        400:
+          description: Bad request
+        500:
+          description: Server error
+
+  /api/payments/{id}:
+    get:
+      summary: Get specific payment details
+      tags:
+        - Payment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Payment details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        404:
+          description: Payment not found
+        500:
+          description: Server error
+
+  /api/payments/{id}/status:
+    get:
+      summary: Get the status of a specific payment
+      tags:
+        - Payment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Payment status retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  payment_id:
+                    type: string
+                  status:
+                    type: string
+                    enum: [COMPLETED, FAILED, IN_PROGRESS]
+        404:
+          description: Payment not found
+        500:
+          description: Server error
+
+  /api/payments/traveler/{traveler_id}:
+    get:
+      summary: Get all payments for a specific traveler
+      tags:
+        - Payment
+      parameters:
+        - name: traveler_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: List of payments for a specific traveler
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  travelerPayments:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Payment'
+        404:
+          description: Traveler not found or no payments found
+        500:
+          description: Server error
+
+  /api/payments/{id}/retry:
+    post:
+      summary: Retry a failed payment
+      tags:
+        - Payment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        201:
+          description: Retry initiated for the payment
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  payment_id:
+                    type: string
+                  status:
+                    type: string
+                    enum: [COMPLETED, FAILED, IN_PROGRESS]
+        404:
+          description: Payment not found
+        409:
+          description: Payment not in a failed state
+        500:
+          description: Server error
+
+  # Feedback APIs
+  /api/feedback:
+    post:
+      summary: Add feedback for a hotel
+      tags:
+        - Feedback
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddFeedbackRequest'
+      responses:
+        201:
+          description: Feedback added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Feedback'
+        400:
+          description: Invalid feedback data or hotel not found
+        403:
+          description: Only travelers can add feedback
+
+  /api/feedback/{hotel_id}:
+    get:
+      summary: Get all feedback for a specific hotel
+      tags:
+        - Feedback
+      parameters:
+        - name: hotel_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Returns feedback list for the hotel
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Feedback'
+        404:
+          description: Hotel not found
+
+  /api/feedback/{id}:
+    delete:
+      summary: Delete feedback by ID
+      tags:
+        - Feedback
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Feedback deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteFeedbackResponse'
+        404:
+          description: Feedback not found
+        403:
+          description: Only hotel managers can delete feedback
+          
+  /hotels:
+    get:
+      summary: Returns a list of all hotels
+      tags:
+        - Hotels
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: A list of hotels
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Hotel'
+        '401':
+          description: Unauthorized - Missing or invalid JWT token
+        '403':
+          description: Forbidden - User does not have the required role to access this resource
+        '500':
+          description: Service is down. Out dev team is on it
+
+    post:
+      summary: Adds a new hotel
+      tags:
+        - Hotels
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Hotel details to insert
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Hotel'
+      responses:
+        '201':
+          description: Hotel created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Hotel'
+        '400':
+          description: Bad Request - Invalid payload or missing required fields
+        '401':
+          description: Unauthorized - Missing or invalid JWT token
+        '403':
+          description: Forbidden - User does not have the required role to access this resource
+        '409':
+          description: Conflict - Hotel with the same name already exists
+        '500':
+          description: Service is down. We will be up soon
+
+  /hotels/{hotelId}:
+    get:
+      summary: Returns a hotel by ID
+      tags:
+        - Hotels
+      parameters:
+        - name: hotelId
+          in: path
+          required: true
+          description: The UUID of the hotel to return
+          schema:
+            type: string
+            format: uuid
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Hotel details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Hotel'
+        '400':
+          description: Bad Request - Invalid `hotelId` format
+        '401':
+          description: Unauthorized - Missing or invalid JWT token
+        '403':
+          description: Forbidden - User does not have the required role to access this resource
+        '404':
+          description: Not Found - No hotel found with the given `hotelId`
+        '500':
+          description: Service is down. We are working on it
+
+    delete:
+      summary: Deletes a hotel by ID
+      parameters:
+        - name: hotelId
+          in: path
+          required: true
+          description: The UUID of the hotel to delete
+          schema:
+            type: string
+            format: uuid
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Hotel deleted successfully
+        '400':
+          description: Bad Request - Invalid `hotelId` format
+        '401':
+          description: Unauthorized - Missing or invalid JWT token
+        '403':
+          description: Forbidden - User does not have the required role to access this resource
+        '404':
+          description: Not Found - No hotel found with the given `hotelId`
+        '500':
+          description: Service is down. We are working on it
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Hotel:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: b295872e-3bef-4f7c-b595-82a6ca2b2b1c
+        name:
+          type: string
+          example: Shettys Kitchen Branch 15
+        location:
+          type: string
+          example: '123 Ocean View Blvd, Beach City'
+        amenities:
+          type: object
+          properties:
+            parking:
+              type: boolean
+              example: true
+            wifi:
+              type: boolean
+              example: true
+            roomService:
+              type: boolean
+              example: true
+            spa:
+              type: boolean
+              example: true
+            pool:
+              type: boolean
+              example: true
+            petFriendly:
+              type: boolean
+              example: false
+            gym:
+              type: boolean
+              example: false
+        description:
+          type: string
+          example: >-
+            A cozy beachside hotel with stunning ocean views and top-notch
+            amenities.
+        rating:
+          type: number
+          format: float
+          example: 4.5
+        managerId:
+          type: string
+          format: uuid
+          example: 3a15df65-6986-4ae9-84ee-81fca5ecb842
+
+  
+    User:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [TRAVELER, HOTEL_MANAGER]
+
+    Payment:
+      type: object
+      properties:
+        payment_id:
+          type: string
+        booking_id:
+          type: integer
+        traveler_id:
+          type: string
+        amount:
+          type: number
+          format: float
+        payment_method:
+          type: string
+          enum: [CREDIT, UPI]
+        status:
+          type: string
+          enum: [COMPLETED, FAILED, IN_PROGRESS]
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    PaymentStatus:
+      type: object
+      properties:
+        payment_id:
+          type: string
+        traveler_id:
+          type: string
+        status:
+          type: string
+          enum: [COMPLETED, FAILED, IN_PROGRESS]
+
+    Feedback:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        hotel_id:
+          type: integer
+        traveler_id:
+          type: string
+          format: uuid
+        comments:
+          type: string
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+
+    AddFeedbackRequest:
+      type: object
+      properties:
+        hotel_id:
+          type: integer
+        traveler_id:
+          type: string
+          format: uuid
+        comments:
+          type: string
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+      required:
+        - hotel_id
+        - traveler_id
+        - rating
+
+    DeleteFeedbackResponse:
+      type: object
+      properties:
+        message:
+          type: string
