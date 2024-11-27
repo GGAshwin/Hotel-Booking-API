@@ -1,7 +1,7 @@
 {
     "scripts": {
-        "start:auth": "node ./services/auth-service/index.js ",
-        "start:feedback": "node ./services/feedback-service/index.js",
-        "start:payment": "node ./services/payment-service/index.js"
+        "start:auth": "node .nodejs-services/services/auth-service/index.js ",
+        "start:feedback": "node .nodejs-services/services/feedback-service/index.js",
+        "start:payment": "node .nodejs-services/services/payment-service/index.js"
     }
 }
