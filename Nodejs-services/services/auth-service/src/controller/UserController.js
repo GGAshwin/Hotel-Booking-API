@@ -1,9 +1,7 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 const { User } = require("../../connect");
 const verifyToken = require("../middlewares/auth");
-const { JWT_SECRET } = require("../constant");
 const { v4: isUUID } = require("uuid");
 
 const router = express.Router();
@@ -14,7 +12,8 @@ router.put("/:user_id", verifyToken, async (req, res) => {
     const { user_id } = req.params;
     const { first_name, last_name, password } = req.body;
 
-    if (req.user.user_id !== user_id && req.user.role !== "HOTEL_MANAGER") {
+    // Ensure only the user themselves can update their profile
+    if (req.user.user_id !== user_id) {
       return res.status(403).json({ error: "Unauthorized access" });
     }
 
@@ -40,13 +39,18 @@ router.put("/:user_id", verifyToken, async (req, res) => {
 });
 
 // Get user profile
-router.get("/:user_id", async (req, res) => {
+router.get("/:user_id", verifyToken, async (req, res) => {
   try {
     const { user_id } = req.params;
 
     // Check if user_id is a valid UUID
     if (!isUUID(user_id)) {
       return res.status(400).json({ error: "User ID must be a valid UUID" });
+    }
+
+    // Ensure only the user themselves or a HOTEL_MANAGER can access the profile
+    if (req.user.user_id !== user_id && req.user.role !== "HOTEL_MANAGER") {
+      return res.status(403).json({ error: "Unauthorized access" });
     }
 
     const user = await User.findByPk(user_id, {
@@ -69,7 +73,7 @@ router.delete("/:user_id", verifyToken, async (req, res) => {
   try {
     const { user_id } = req.params;
 
-    // Ensure the logged-in user is the same as the user being deleted
+    // Ensure only the user themselves can delete their account
     if (req.user.user_id !== user_id) {
       return res.status(403).json({ error: "Unauthorized access" });
     }
