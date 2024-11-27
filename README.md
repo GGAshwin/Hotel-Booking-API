@@ -1,4 +1,13 @@
 # Hotel-Booking-API
+
+By,
+
+*   GG Ashwin Prabhu
+*   Sharan Kumar
+*   Rimika Bhaumik
+*   Sthuthi B
+*   Harshvardhan Jaiswal
+
 This project is a distributed system for managing hotel bookings, including services for authentication, payments, and feedback. Each service runs independently to ensure scalability and modularity.
 
 ---
