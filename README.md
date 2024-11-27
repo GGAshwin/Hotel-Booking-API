@@ -136,3 +136,121 @@ All endpoints requiring user authentication use a Bearer Token passed in the `Au
   "updatedAt": "string"
 }
 ```
+
+# User Endpoints
+
+This section describes the User-related API endpoints.
+
+## 1. Get User Profile
+
+- **URL:** `/api/users/{user_id}`
+- **Method:** `GET`
+- **Description:** Retrieve user profile information by user ID.
+- **Request Headers:**
+  - `Authorization: Bearer <token>`
+- **URL Parameters:**
+  - `user_id` (string) - The ID of the user.
+- **Security:** Bearer Authentication
+- **Responses:**
+  - `200 OK`
+    - **Description:** User profile information.
+    - **Response Body:**
+      ```json
+      {
+        "id": "12345",
+        "first_name": "John",
+        "last_name": "Doe",
+        "email": "john.doe@example.com",
+        "role": "TRAVELER"
+      }
+      ```
+  - `403 Forbidden`
+    - **Description:** Unauthorized access.
+  - `404 Not Found`
+    - **Description:** User not found.
+  - `500 Internal Server Error`
+    - **Description:** Server error.
+
+## 2. Update User Profile
+
+- **URL:** `/api/users/{user_id}`
+- **Method:** `PUT`
+- **Description:** Update user profile information.
+- **Request Headers:**
+  - `Authorization: Bearer <token>`
+  - `Content-Type: application/json`
+- **URL Parameters:**
+  - `user_id` (string) - The ID of the user.
+- **Request Body:**
+  - Example:
+    ```json
+    {
+      "first_name": "John",
+      "last_name": "Smith",
+      "password": "newPassword123"
+    }
+    ```
+- **Security:** Bearer Authentication
+- **Responses:**
+  - `200 OK`
+    - **Description:** Profile updated successfully.
+    - **Response Body:**
+      ```json
+      {
+        "id": "12345",
+        "first_name": "John",
+        "last_name": "Smith",
+        "email": "john.doe@example.com",
+        "role": "TRAVELER"
+      }
+      ```
+  - `403 Forbidden`
+    - **Description:** Unauthorized access.
+  - `404 Not Found`
+    - **Description:** User not found.
+  - `500 Internal Server Error`
+    - **Description:** Server error.
+
+## 3. Delete User Account
+
+- **URL:** `/api/users/{user_id}`
+- **Method:** `DELETE`
+- **Description:** Delete a user account by user ID.
+- **Request Headers:**
+  - `Authorization: Bearer <token>`
+- **URL Parameters:**
+  - `user_id` (string) - The ID of the user.
+- **Security:** Bearer Authentication
+- **Responses:**
+  - `200 OK`
+    - **Description:** User deleted successfully.
+    - **Response Body:**
+      ```json
+      {
+        "message": "User deleted successfully"
+      }
+      ```
+  - `403 Forbidden`
+    - **Description:** Unauthorized access.
+    - **Response Body:**
+      ```json
+      {
+        "error": "Unauthorized access"
+      }
+      ```
+  - `404 Not Found`
+    - **Description:** User not found.
+    - **Response Body:**
+      ```json
+      {
+        "error": "User not found"
+      }
+      ```
+  - `500 Internal Server Error`
+    - **Description:** Server error.
+    - **Response Body:**
+      ```json
+      {
+        "error": "Server error"
+      }
+      ```
