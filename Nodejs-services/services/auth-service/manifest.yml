@@ -1,5 +1,5 @@
 applications:
-  - name: payment-service
+  - name: auth-service
     memory: 512M
     disk_quota: 1G
     instances: 1
