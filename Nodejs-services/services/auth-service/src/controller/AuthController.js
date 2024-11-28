@@ -83,7 +83,7 @@ router.post("/login", async (req, res) => {
       }
     );
 
-    res.status(200).json({ token });
+    res.status(200).json({ token, user_id: existingUser.user_id });
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
   }
