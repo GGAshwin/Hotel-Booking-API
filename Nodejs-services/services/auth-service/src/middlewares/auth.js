@@ -14,7 +14,10 @@ const verifyToken = (req, res, next) => {
     }
   }
 
-  tokenToBeUsed = token ? token : tokenFromHeader.split(' ')[1];;
+  console.log(tokenFromHeader);
+  console.log("here");
+
+  tokenToBeUsed = token ? token : tokenFromHeader.split(" ")[1];
 
   jwt.verify(tokenToBeUsed, JWT_SECRET, (err, decoded) => {
     if (err) return res.status(401).json({ error: "Invalid token" });
