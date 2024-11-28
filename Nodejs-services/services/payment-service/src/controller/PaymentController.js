@@ -38,6 +38,10 @@ async function authenticateToken(req, res, next) {
     next();
   } catch (error) {
     console.error("Authentication Error:", error.message);
+    if (error.status === 401) {
+      res.status(401).json({ error: "Invalid Token" });
+      return;
+    }
     res.status(500).json({ error: "Authentication failed" });
   }
 }
