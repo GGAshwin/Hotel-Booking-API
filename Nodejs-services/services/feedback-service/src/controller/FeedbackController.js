@@ -8,10 +8,10 @@ connectAndSync();
 
 // const AUTH_SERVICE_URL = "http://localhost:3000/auth";
 // const AUTH_SERVICE_URL = "http://localhost:3000/auth";
-const AUTH_BASE_URL =
+const AUTH_SERVICE_URL =
   "https://auth-service.cfapps.us10-001.hana.ondemand.com/auth";
 const HOTL_SERVICE_URL =
-  "https://hotel-service.cfapps.eu12.hana.ondemand.com/api/hotels";
+  "https://hotel-service.cfapps.eu12.hana.ondemand.com/api";
 // const HOTL_SERVICE_URL = "http://localhost:8080";
 
 // Middleware to verify user role
@@ -64,10 +64,14 @@ async function checkIfHotelExists(hotel_id, token) {
       },
     });
 
+    console.log(response);
+
     if (response.status === 200 && response.data) {
       return response.data; // Return the hotel data if it exists
     }
   } catch (error) {
+    console.log(error);
+
     console.error("Error checking hotel existence:", error.message || error);
   }
   return null; // Return null if the hotel doesn't exist or there's an error
@@ -79,6 +83,8 @@ router.post("/", async (req, res) => {
   const token = req.headers.authorization?.split(" ")[1];
 
   const isTraveler = await verifyUserRole(token, "TRAVELER");
+  console.log(isTraveler);
+
   if (!isTraveler) {
     return res.status(403).json({
       error: "Only users with the role of TRAVELER can give feedback",
@@ -163,7 +169,6 @@ router.delete("/:id", async (req, res) => {
     );
     const { role, userId: userId } = verifyResponse.data;
     console.log(verifyResponse.data);
-    
 
     // Fetch the feedback record using the feedback ID
     const feedback = await Feedback.findOne({ where: { id: feedbackId } });
@@ -176,7 +181,10 @@ router.delete("/:id", async (req, res) => {
     // Authorization logic:
     // - HOTEL_MANAGER can delete any feedback
     // - TRAVELER can delete their own feedback only
-    if (role === "HOTEL_MANAGER" || (role === "TRAVELER" && feedback.traveler_id === userId)) {
+    if (
+      role === "HOTEL_MANAGER" ||
+      (role === "TRAVELER" && feedback.traveler_id === userId)
+    ) {
       // Delete the feedback
       await Feedback.destroy({ where: { id: feedbackId } });
       return res.status(200).json({ message: "Feedback deleted successfully" });
