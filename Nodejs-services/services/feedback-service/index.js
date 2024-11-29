@@ -1,7 +1,9 @@
 const express = require("express");
 const app = express();
-const FeedbackController = require('./src/controller/FeedbackController'); // Adjust path if needed
-require('dotenv').config();
+const FeedbackController = require("./src/controller/FeedbackController"); // Adjust path if needed
+const port = process.env.PORT || 3002;
+const environment = process.env.NODE_ENV || "development";
+require("dotenv").config();
 
 app.use(express.json());
 
@@ -14,6 +16,8 @@ app.get("/health", (req, res) => {
 });
 
 // Start the feedback service server
-app.listen(3002, () => {
-  console.log("listening to port 3002 (FEEDBACK SERVICE)");
+app.listen(port, () => {
+  console.log(
+    `listening to port ${port} (FEEDBACK SERVICE) running in ${environment} environment`
+  );
 });

@@ -4,8 +4,12 @@ const router = express.Router();
 const Joi = require("joi");
 const axios = require("axios");
 
-const USER_BASE_URL = "http://localhost:3000/api/users";
-const AUTH_BASE_URL = "http://localhost:3000/auth/verify";
+// const USER_BASE_URL = "http://localhost:3000/api/users";
+const USER_BASE_URL =
+  "https://auth-service.cfapps.us10-001.hana.ondemand.com/api/users";
+// const AUTH_BASE_URL = "http://localhost:3000/auth/verify";
+const AUTH_BASE_URL =
+  "https://auth-service.cfapps.us10-001.hana.ondemand.com/auth/verify";
 
 // Connect to DB
 connectAndSync();
