@@ -281,9 +281,8 @@ Access is restricted based on user roles:
 ---
 
 ## Endpoints
-
+### 1. Retrieve a list of payments with optional filters.
 ### **GET /api/payments/**
-Retrieve a list of payments with optional filters.
 
 **Required Token:**  
 `TRAVELER` (only their payments) or `HOTEL_MANAGER` (any payment).
@@ -299,8 +298,8 @@ Retrieve a list of payments with optional filters.
 
 ---
 
+### 2. Retrieve all payment statuses (HOTEL_MANAGER only).
 ### **GET /api/payments/status**
-Retrieve all payment statuses (HOTEL_MANAGER only).
 
 **Required Token:**  
 `HOTEL_MANAGER`
@@ -310,8 +309,8 @@ Retrieve all payment statuses (HOTEL_MANAGER only).
 
 ---
 
+### 3. Make a new payment.
 ### **POST /api/payments/**
-Make a new payment.
 
 **Required Token:**  
 `TRAVELER`
@@ -325,8 +324,8 @@ Make a new payment.
 
 ---
 
+### 4. Retrieve a specific payment by its ID.
 ### **GET /api/payments/:id**
-Retrieve a specific payment by its ID.
 
 **Required Token:**  
 `TRAVELER` (only their payments) or `HOTEL_MANAGER` (any payment).
@@ -338,8 +337,8 @@ Retrieve a specific payment by its ID.
 
 ---
 
+### 5. Retrieve the status of a specific payment.
 ### **GET /api/payments/:id/status**
-Retrieve the status of a specific payment.
 
 **Required Token:**  
 `TRAVELER` (only their payments) or `HOTEL_MANAGER` (any payment).
@@ -351,8 +350,8 @@ Retrieve the status of a specific payment.
 
 ---
 
+### 6. Retrieve all payments for a specific traveler.
 ### **GET /api/payments/traveler/:traveler_id**
-Retrieve all payments for a specific traveler.
 
 **Required Token:**  
 `TRAVELER` (only their payments) or `HOTEL_MANAGER` (any payment).
@@ -364,8 +363,8 @@ Retrieve all payments for a specific traveler.
 
 ---
 
+### 7. Retry a failed payment.
 ### **POST /api/payments/:id/retry**
-Retry a failed payment.
 
 **Required Token:**  
 `TRAVELER`
