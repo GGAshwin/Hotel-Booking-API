@@ -6,7 +6,7 @@ const router = express.Router();
 
 connectAndSync();
 
-// const AUTH_SERVICE_URL = "http://localhost:3000/auth";
+const AUTH_SERVICE_URL = "http://localhost:3000/auth";
 // const AUTH_SERVICE_URL = "http://localhost:3000/auth";
 const AUTH_BASE_URL =
   "https://auth-service.cfapps.us10-001.hana.ondemand.com/auth";
@@ -146,6 +146,26 @@ router.get("/:hotel_id", async (req, res) => {
     res
       .status(500)
       .json({ error: "Failed to retrieve feedback", details: error });
+  }
+});
+
+// Get feedback for all hotels
+router.get("/", async (req, res) => {
+  try {
+    const feedbacks = await Feedback.findAll({
+      attributes: ["id", "hotel_id", "traveler_id", "comments", "rating", "created_at"],
+      order: [["created_at", "DESC"]],
+    });
+
+    if (feedbacks.length === 0) {
+      return res.status(200).json({ message: "No feedback available for any hotel" });
+    }
+
+    res.status(200).json(feedbacks);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Failed to retrieve feedback for all hotels", details: error });
   }
 });
 
