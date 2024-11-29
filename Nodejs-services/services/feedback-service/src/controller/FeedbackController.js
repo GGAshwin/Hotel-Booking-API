@@ -6,7 +6,6 @@ const router = express.Router();
 
 connectAndSync();
 
-const AUTH_SERVICE_URL = "http://localhost:3000/auth";
 // const AUTH_SERVICE_URL = "http://localhost:3000/auth";
 const AUTH_SERVICE_URL =
   "https://auth-service.cfapps.us10-001.hana.ondemand.com/auth";
