@@ -61,6 +61,12 @@ The Auth Service provides endpoints for user registration, login, token verifica
   ```
 - **Responses:**
   - `200 OK`: Login successful, token returned.
+   ```json
+    {
+      "token": string,
+      "userId": "string"
+    }
+    ```
   - `400 Bad Request`: User not found or invalid credentials.
   - `500 Internal Server Error`: Server error.
 
