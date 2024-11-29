@@ -391,3 +391,35 @@ Access is restricted based on user roles:
 Payments initially have the status `IN_PROGRESS`. After a short delay, the status is updated to:
 - `COMPLETED` (80% chance)
 - `FAILED` (20% chance)
+
+
+# Feedback API Documentation
+
+# Overview 
+
+The Feedback Service handles operations related to feedback for hotels, including adding, retrieving, and deleting feedback. The service enforces role-based access control, ensuring that only authorized users can perform specific actions.
+
+# Authentication
+
+All endpoints requiring user authentication use a Bearer Token passed in the `Authorization` header.
+
+### Role-Based Access Control
+- **TRAVELER**: Can add feedback for hotels.
+                Can delete their own feedback.
+- **HOTEL MANAGER**: Can delete any feedback for hotels.
+
+## Models
+
+### User Object
+
+```json
+{
+  "id": "number",
+  "hotel_id": "string",
+  "traveler_id": "string",
+  "comments": "string",
+  "rating": "number",
+  "createdAt": "string",
+  "updatedAt": "string"
+}
+```
