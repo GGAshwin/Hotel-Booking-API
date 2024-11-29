@@ -260,3 +260,135 @@ This section describes the User-related API endpoints.
         "error": "Server error"
       }
       ```
+
+
+# Payment API Documentation
+
+This Payment API is part of the Hotel Booking System, enabling payment management for bookings. The API supports operations like making payments, retrieving payment details, checking payment status, retrying failed payments, and more.
+
+## Prerequisites
+
+### Authentication & Authorization
+All endpoints require an **Authorization token** in the `Authorization` header:
+- Token format: `Bearer <JWT_TOKEN>`
+- Tokens are validated using the `Auth Service`.
+
+### Roles
+Access is restricted based on user roles:
+- **TRAVELER**: Regular user making payments.
+- **HOTEL_MANAGER**: Administrator managing payments across the system.
+
+---
+
+## Endpoints
+
+### **GET /api/payments/**
+Retrieve a list of payments with optional filters.
+
+**Required Token:**  
+`TRAVELER` (only their payments) or `HOTEL_MANAGER` (any payment).
+
+#### Query Parameters:
+| Parameter    | Type     | Description                                                   |
+|--------------|----------|---------------------------------------------------------------|
+| `payment_id` | `string` | Filter by payment ID.                                         |
+| `traveler_id`| `string` | Filter by traveler ID (HOTEL_MANAGER only).                   |
+| `status`     | `string` | Filter by payment status (`IN_PROGRESS`, `FAILED`, `COMPLETED`). |
+| `order_by`   | `string` | Order results by column (default: `created_at`).              |
+| `order`      | `string` | Order direction (`ASC` or `DESC`, default: `ASC`).            |
+
+---
+
+### **GET /api/payments/status**
+Retrieve all payment statuses (HOTEL_MANAGER only).
+
+**Required Token:**  
+`HOTEL_MANAGER`
+
+#### Response:
+- List of payments with `payment_id`, `traveler_id`, and `status`.
+
+---
+
+### **POST /api/payments/**
+Make a new payment.
+
+**Required Token:**  
+`TRAVELER`
+
+#### Request Body:
+| Field           | Type     | Description                         |
+|------------------|----------|-------------------------------------|
+| `user_id`        | `string` | ID of the user making the payment.  |
+| `amount`         | `number` | Payment amount (must be positive).  |
+| `payment_method` | `string` | Payment method (`CREDIT` or `UPI`). |
+
+---
+
+### **GET /api/payments/:id**
+Retrieve a specific payment by its ID.
+
+**Required Token:**  
+`TRAVELER` (only their payments) or `HOTEL_MANAGER` (any payment).
+
+#### Path Parameters:
+| Parameter | Type     | Description               |
+|-----------|----------|---------------------------|
+| `id`      | `string` | ID of the payment to fetch.|
+
+---
+
+### **GET /api/payments/:id/status**
+Retrieve the status of a specific payment.
+
+**Required Token:**  
+`TRAVELER` (only their payments) or `HOTEL_MANAGER` (any payment).
+
+#### Path Parameters:
+| Parameter | Type     | Description               |
+|-----------|----------|---------------------------|
+| `id`      | `string` | ID of the payment to fetch.|
+
+---
+
+### **GET /api/payments/traveler/:traveler_id**
+Retrieve all payments for a specific traveler.
+
+**Required Token:**  
+`TRAVELER` (only their payments) or `HOTEL_MANAGER` (any payment).
+
+#### Path Parameters:
+| Parameter     | Type     | Description                      |
+|---------------|----------|----------------------------------|
+| `traveler_id` | `string` | ID of the traveler to retrieve payments for.|
+
+---
+
+### **POST /api/payments/:id/retry**
+Retry a failed payment.
+
+**Required Token:**  
+`TRAVELER`
+
+#### Path Parameters:
+| Parameter | Type     | Description                     |
+|-----------|----------|---------------------------------|
+| `id`      | `string` | ID of the payment to retry.     |
+
+#### Notes:
+- Only payments in `FAILED` status can be retried.
+
+---
+
+## Error Handling
+- **401 Unauthorized:** Invalid or missing token.
+- **403 Forbidden:** Insufficient permissions.
+- **404 Not Found:** Resource not found.
+- **500 Internal Server Error:** Unexpected server issue.
+
+---
+
+## Simulated Payment Processing
+Payments initially have the status `IN_PROGRESS`. After a short delay, the status is updated to:
+- `COMPLETED` (80% chance)
+- `FAILED` (20% chance)
