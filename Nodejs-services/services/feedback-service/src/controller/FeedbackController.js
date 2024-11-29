@@ -154,6 +154,26 @@ router.get("/:hotel_id", async (req, res) => {
   }
 });
 
+// Get feedback for all hotels
+router.get("/", async (req, res) => {
+  try {
+    const feedbacks = await Feedback.findAll({
+      attributes: ["id", "hotel_id", "traveler_id", "comments", "rating", "created_at"],
+      order: [["created_at", "DESC"]],
+    });
+
+    if (feedbacks.length === 0) {
+      return res.status(200).json({ message: "No feedback available for any hotel" });
+    }
+
+    res.status(200).json(feedbacks);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Failed to retrieve feedback for all hotels", details: error });
+  }
+});
+
 // Delete feedback by ID (Only HOTEL_MANAGER can delete any feedback, or TRAVELER can delete their own feedback)
 router.delete("/:id", async (req, res) => {
   const token = req.headers.authorization?.split(" ")[1]; // Extract the Bearer token
