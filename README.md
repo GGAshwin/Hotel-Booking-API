@@ -10,6 +10,8 @@ By,
 
 This project is a distributed system for managing hotel bookings, including services for authentication, payments, and feedback. Each service runs independently to ensure scalability and modularity.
 
+##All the Endpoints in this API is built using REST principles
+
 ---
 # Steps to run the API
 1. run   `npm run start:auth` to start the auth service
