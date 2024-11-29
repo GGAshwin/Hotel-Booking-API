@@ -393,3 +393,93 @@ Access is restricted based on user roles:
 Payments initially have the status `IN_PROGRESS`. After a short delay, the status is updated to:
 - `COMPLETED` (80% chance)
 - `FAILED` (20% chance)
+
+
+# Feedback API Documentation
+
+# Overview 
+
+The Feedback Service handles operations related to feedback for hotels, including adding, retrieving, and deleting feedback. The service enforces role-based access control, ensuring that only authorized users can perform specific actions.
+
+# Authentication
+
+All endpoints requiring user authentication use a Bearer Token passed in the `Authorization` header.
+
+### Role-Based Access Control
+- **TRAVELER**: Can add feedback for hotels.
+                Can delete their own feedback.
+- **HOTEL MANAGER**: Can delete any feedback for hotels.
+
+## Models
+
+### User Object
+
+```json
+{
+  "id": "number",
+  "hotel_id": "string",
+  "traveler_id": "string",
+  "comments": "string",
+  "rating": "number",
+  "createdAt": "string",
+  "updatedAt": "string"
+}
+```
+## Endpoints
+
+### 1. Add Feedback
+
+- **URL:** `/feedback`
+- **Method:** `POST`
+- **Summary:** Add feedback for a specific hotel. Only users with the role of TRAVELER can provide feedback..
+- **Headers:**
+    Authorization: Bearer <token>
+    Content-Type: application/json
+- **Request Body:**
+  ```json
+  {
+    "hotel_id": "string",
+    "traveler_id": "string",
+    "comments": "string",
+    "rating": "number"
+  }
+  ```
+- **Responses:**
+  - `201 Created`: Feedback added successfully.
+  - `400 Bad Request`:  Feedback already exists for this traveler and hotel.
+  - `403 Forbidden`: Unauthorized access.
+  - `404 Not Found`: Hotel not found.
+  - `500 Internal Server Error`: Server error.
+
+### 2. Get Feedback for a Hotel
+
+- **URL:** `/feedback/{hotel_id}`
+- **Method:** `GET`
+- **Summary:** Retrieve feedback for a specific hotel, with optional sorting.
+- **Headers:**
+    Authorization: Bearer <token>
+- **Path Parameters:** 
+   `hotel_id (string)`: The ID of the hotel.
+- **Query Parameters (Optional):**
+   `sort (string)`: Sort feedback by rating or date. Defaults to date.
+   `order (string)`: Sort order, either asc or desc. Defaults to desc.
+
+- **Responses:**
+  - `201 OK`: Feedback retrieved successfully.
+  - `404 Not Found`: Hotel not found.
+  - `500 Internal Server Error`: Server error.
+
+### 3. Delete Feedback
+
+- **URL:** `/feedback{id}`
+- **Method:** `DELETE`
+- **Summary:** Delete feedback by ID. Only HOTEL_MANAGER users can delete any feedback, while TRAVELER users can delete their own feedback.
+- **Headers:**
+    Authorization: Bearer <token>
+- **Path Parameters:** 
+   `id (number)`: The ID of the feedback.
+- **Responses:**
+  - `201 OK`: Feedback deleted successfully.
+  - `403 Forbidden`: Unauthorized access.
+  - `404 Not Found`: Feedback not found.
+  - `500 Internal Server Error`: Failed to delete feedback.
