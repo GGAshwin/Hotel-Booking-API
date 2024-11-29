@@ -447,9 +447,9 @@ All endpoints requiring user authentication use a Bearer Token passed in the `Au
 - **Responses:**
   - `201 Created`: Feedback added successfully.
   - `400 Bad Request`:  Feedback already exists for this traveler and hotel.
-  - `403 Forbidden`: Unauthorized access.
+  - `403 Forbidden`: Only users with the role of TRAVELER can give feedback.
   - `404 Not Found`: Hotel not found.
-  - `500 Internal Server Error`: Server error.
+  - `500 Internal Server Error`: Failed to add feedback.
 
 ### 2. Get Feedback for a Hotel
 
@@ -466,6 +466,7 @@ All endpoints requiring user authentication use a Bearer Token passed in the `Au
 
 - **Responses:**
   - `201 OK`: Feedback retrieved successfully.
+  - `201 OK`: No feedback available for this hotel.
   - `404 Not Found`: Hotel not found.
   - `500 Internal Server Error`: Server error.
 
