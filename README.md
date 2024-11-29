@@ -449,7 +449,7 @@ All endpoints requiring user authentication use a Bearer Token passed in the `Au
   - `404 Not Found`: Hotel not found.
   - `500 Internal Server Error`: Server error.
 
-  ### 2. Get Feedback for a Hotel
+### 2. Get Feedback for a Hotel
 
 - **URL:** `/feedback/{hotel_id}`
 - **Method:** `GET`
