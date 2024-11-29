@@ -6,9 +6,13 @@ const router = express.Router();
 
 connectAndSync();
 
-const AUTH_SERVICE_URL = "http://localhost:3000/auth";
-// const HOTL_SERVICE_URL = 'https://hotel-service.cfapps.eu12.hana.ondemand.com/hotels/'
-const HOTL_SERVICE_URL = "http://localhost:8080";
+// const AUTH_SERVICE_URL = "http://localhost:3000/auth";
+// const AUTH_SERVICE_URL = "http://localhost:3000/auth";
+const AUTH_BASE_URL =
+  "https://auth-service.cfapps.us10-001.hana.ondemand.com/auth";
+const HOTL_SERVICE_URL =
+  "https://hotel-service.cfapps.eu12.hana.ondemand.com/api/hotels";
+// const HOTL_SERVICE_URL = "http://localhost:8080";
 
 // Middleware to verify user role
 async function verifyUserRole(token, expectedRole) {
@@ -44,10 +48,10 @@ async function generateUserToken() {
       email: "service_account.traveler@example.com",
       password: "service_account_secret",
     });
-  
+
     return traveler_token.data.token;
   } catch (error) {
-    console.error('User not found');
+    console.error("User not found");
     return;
   }
 }
@@ -78,7 +82,6 @@ router.post("/", async (req, res) => {
   );
 
   console.log(existingHotel);
-  
 
   if (!existingHotel.data) {
     return res.status(400).json({ error: "Hotel not found" });
