@@ -1,0 +1,641 @@
+{
+    "info": {
+        "_postman_id": "cc019639-e833-4b8a-a591-91ac58658829",
+        "name": "Combined Hotel Booking API",
+        "schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+        "_exporter_id": "17720610",
+        "_collection_link": "https://jobless-4068.postman.co/workspace/jobless-Workspace~6724a17c-7f8a-4422-8f13-fe37a5c9e2f0/collection/17720610-cc019639-e833-4b8a-a591-91ac58658829?action=share&source=collection_link&creator=17720610"
+    },
+    "item": [
+        {
+            "name": "listen-auth",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": "http://localhost:3000/health"
+            },
+            "response": []
+        },
+        {
+            "name": "register",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"first_name\": \"ashwin\",\n  \"last_name\": \"manager\",\n  \"email\": \"ashwin@manager.com\",\n  \"password\": \"ashwin\",\n  \"role\": \"HOTEL_MANAGER\"\n}"
+                },
+                "url": "http://localhost:3000/auth/register"
+            },
+            "response": []
+        },
+        {
+            "name": "Login",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"email\": \"ashwin@prabhu.com\",\n  \"password\": \"ashwin\"\n}"
+                },
+                "url": "http://localhost:3000/auth/login"
+            },
+            "response": []
+        },
+        {
+            "name": "Verify",
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": {
+                        "token": "{{TOKEN}}"
+                    }
+                },
+                "method": "POST",
+                "header": [],
+                "url": "http://localhost:3000/auth/verify"
+            },
+            "response": []
+        },
+        {
+            "name": "Payment",
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": {
+                        "token": "{{TOKEN}}"
+                    }
+                },
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"user_id\": \"619ceb2b-54ea-4da1-89f6-98c5089a7b7d\",\n  \"amount\": \"1\",\n  \"payment_method\": \"CREDIT\"\n}"
+                },
+                "url": "http://localhost:3001/api/payments"
+            },
+            "response": []
+        },
+        {
+            "name": "Get payment",
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": {
+                        "token": "{{TOKEN}}"
+                    }
+                },
+                "method": "GET",
+                "header": [],
+                "url": "{{PAYMENTS_URL}}/d2a1447e-2f71-4c4d-8881-e7e6eb32d21f"
+            },
+            "response": []
+        },
+        {
+            "name": "Payment Status",
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": {
+                        "token": "{{TOKEN}}"
+                    }
+                },
+                "method": "GET",
+                "header": [],
+                "url": "{{PAYMENTS_URL}}/d2a1447e-2f71-4c4d-8881-e7e6eb32d21f/status"
+            },
+            "response": []
+        },
+        {
+            "name": "All Payments",
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": {
+                        "token": "{{TOKEN}}"
+                    }
+                },
+                "method": "GET",
+                "header": [],
+                "url": "{{PAYMENTS_URL}}/"
+            },
+            "response": []
+        },
+        {
+            "name": "Payments with search params",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{PAYMENTS_URL}}/?traveler_id=ac96ab86-812a-4c45-bb4c-71535ddf7430",
+                    "host": [
+                        "{{PAYMENTS_URL}}"
+                    ],
+                    "path": [
+                        ""
+                    ],
+                    "query": [
+                        {
+                            "key": "traveler_id",
+                            "value": "ac96ab86-812a-4c45-bb4c-71535ddf7430"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Get all payment status",
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": {
+                        "token": "{{TOKEN}}"
+                    }
+                },
+                "method": "GET",
+                "header": [],
+                "url": "{{PAYMENTS_URL}}/status"
+            },
+            "response": []
+        },
+        {
+            "name": "Retry Payment",
+            "request": {
+                "method": "POST",
+                "header": [],
+                "url": "http://localhost:3001/api/payments/ccd1fe79-5713-4842-8b71-ee755f16a4e7/retry"
+            },
+            "response": []
+        },
+        {
+            "name": "All Hotels",
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": {
+                        "token": "{{TOKEN}}"
+                    }
+                },
+                "method": "GET",
+                "header": [],
+                "url": "{{HOTEL_URL}}"
+            },
+            "response": []
+        },
+        {
+            "name": "Add Feedback",
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": {
+                        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjE5Y2ViMmItNTRlYS00ZGExLTg5ZjYtOThjNTA4OWE3YjdkIiwicm9sZSI6IlRSQVZFTEVSIiwiaWF0IjoxNzMyMDM4OTg2LCJleHAiOjE3MzIwNDI1ODZ9.EME-fnfK8FtM3syUEaq9ugAKvQM4cM2patRsFHsyJ18"
+                    }
+                },
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"hotel_id\": \"f725afcd-3088-4372-acd7-8ee855515aa7\",\n  \"traveler_id\": \"619ceb2b-54ea-4da1-89f6-98c5089a7b7d\",\n  \"comments\": \"Very nice!\",\n  \"rating\": 4\n}"
+                },
+                "url": "http://localhost:3002/api/feedback"
+            },
+            "response": []
+        },
+        {
+            "name": "Get Feedback",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{FEEDBACK_URL}}f725afcd-3088-4372-acd7-8ee855515aa7?sort=date&order=desc",
+                    "host": [
+                        "{{FEEDBACK_URL}}f725afcd-3088-4372-acd7-8ee855515aa7"
+                    ],
+                    "query": [
+                        {
+                            "key": "sort",
+                            "value": "date"
+                        },
+                        {
+                            "key": "order",
+                            "value": "desc"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Delete Feedback",
+            "request": {
+                "method": "GET",
+                "header": []
+            },
+            "response": []
+        },
+        {
+            "name": "get user by id",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": "http://localhost:3000/users/a40259b9-0c1c-4fdc-bc1b-b51f3c8846ba"
+            },
+            "response": []
+        },
+        {
+            "name": "DELETE user",
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": {
+                        "token": "{{TOKEN}}"
+                    }
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": "{{AUTH_URL}}/api/users/8fc7054a-ab0b-4a6d-b20e-749646705050"
+            },
+            "response": []
+        },
+        {
+            "name": "createHotel",
+            "request": {
+                "url": "https://hotel-service.cfapps.eu12.hana.ondemand.com/hotels",
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    },
+                    {
+                        "key": "User-Agent",
+                        "value": "insomnia/10.1.1"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"name\": \"Shettys Kitchen Branch 15\",\n  \"location\": \"123 Ocean View Blvd, Beach City\",\n  \"amenities\": {\n    \"wifi\": true,\n    \"pool\": true,\n    \"gym\": false,\n    \"parking\": true,\n    \"spa\": true,\n    \"roomService\": true,\n    \"petFriendly\": false\n  },\n  \"description\": \"A cozy beachside hotel with stunning ocean views and top-notch amenities.\",\n  \"rating\": 4.5,\n  \"managerId\": \"3a15df65-6986-4ae9-84ee-81fca5ecb842\"\n}\n"
+                },
+                "auth": {
+                    "type": "bearer",
+                    "bearer": {
+                        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYmEyMWM1NzktNjNkZS00YmM3LWEzOGUtOWYxYzQ5MDdmMTU0Iiwicm9sZSI6IkhPVEVMX01BTkFHRVIiLCJpYXQiOjE3MzE5NTUyMDksImV4cCI6MTczMTk1ODgwOX0.egalavYDEy7EdUskeXaHj2IibdPofnPm4qUng2tpWoQ"
+                    }
+                }
+            }
+        },
+        {
+            "name": "getHotels",
+            "request": {
+                "url": "https://hotel-service.cfapps.eu12.hana.ondemand.com/hotels",
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    },
+                    {
+                        "key": "User-Agent",
+                        "value": "insomnia/10.1.1"
+                    }
+                ],
+                "auth": {
+                    "type": "bearer",
+                    "bearer": {
+                        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYmEyMWM1NzktNjNkZS00YmM3LWEzOGUtOWYxYzQ5MDdmMTU0Iiwicm9sZSI6IkhPVEVMX01BTkFHRVIiLCJpYXQiOjE3MzE5NTUyMDksImV4cCI6MTczMTk1ODgwOX0.egalavYDEy7EdUskeXaHj2IibdPofnPm4qUng2tpWoQ"
+                    }
+                }
+            }
+        },
+        {
+            "name": "getHotel",
+            "request": {
+                "url": "https://hotel-service.cfapps.eu12.hana.ondemand.com/hotels/b295872e-3bef-4f7c-b595-82a6ca2b2b1c",
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    },
+                    {
+                        "key": "User-Agent",
+                        "value": "insomnia/10.1.1"
+                    }
+                ],
+                "auth": {
+                    "type": "bearer",
+                    "bearer": {
+                        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYmEyMWM1NzktNjNkZS00YmM3LWEzOGUtOWYxYzQ5MDdmMTU0Iiwicm9sZSI6IkhPVEVMX01BTkFHRVIiLCJpYXQiOjE3MzE5NTUyMDksImV4cCI6MTczMTk1ODgwOX0.egalavYDEy7EdUskeXaHj2IibdPofnPm4qUng2tpWoQ"
+                    }
+                }
+            }
+        },
+        {
+            "name": "deleteHotel",
+            "request": {
+                "url": "https://hotel-service.cfapps.eu12.hana.ondemand.com/hotels/b5d3e348-78a3-4c8e-a0fa-e66e65802af6",
+                "method": "DELETE",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    },
+                    {
+                        "key": "User-Agent",
+                        "value": "insomnia/10.1.1"
+                    }
+                ],
+                "auth": {}
+            }
+        },
+        {
+            "name": "createHotel (local)",
+            "request": {
+                "url": "http://localhost:8080/hotels",
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    },
+                    {
+                        "key": "User-Agent",
+                        "value": "insomnia/10.1.1"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"name\": \"Shettys Kitchen Branch 14\",\n  \"location\": \"123 Ocean View Blvd, Beach City\",\n  \"amenities\": {\n    \"wifi\": true,\n    \"pool\": true,\n    \"gym\": false,\n    \"parking\": true,\n    \"spa\": true,\n    \"roomService\": true,\n    \"petFriendly\": false\n  },\n  \"description\": \"A cozy beachside hotel with stunning ocean views and top-notch amenities.\",\n  \"rating\": 4.5,\n  \"managerId\": \"3a15df65-6986-4ae9-84ee-81fca5ecb842\"\n}\n"
+                },
+                "auth": {
+                    "type": "bearer",
+                    "bearer": {
+                        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYmEyMWM1NzktNjNkZS00YmM3LWEzOGUtOWYxYzQ5MDdmMTU0Iiwicm9sZSI6IkhPVEVMX01BTkFHRVIiLCJpYXQiOjE3MzE5NTQ1NjIsImV4cCI6MTczMTk1ODE2Mn0.TUeAxD6y7MHNSXtZYZmVPhrsKv6L9NpY37HlWkZnBv0"
+                    }
+                }
+            }
+        },
+        {
+            "name": "getHotels (local)",
+            "request": {
+                "url": "http://localhost:8080/hotels",
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    },
+                    {
+                        "key": "User-Agent",
+                        "value": "insomnia/10.1.1"
+                    }
+                ],
+                "auth": {
+                    "type": "bearer",
+                    "bearer": {
+                        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYmEyMWM1NzktNjNkZS00YmM3LWEzOGUtOWYxYzQ5MDdmMTU0Iiwicm9sZSI6IkhPVEVMX01BTkFHRVIiLCJpYXQiOjE3MzE5NTQ1NjIsImV4cCI6MTczMTk1ODE2Mn0.TUeAxD6y7MHNSXtZYZmVPhrsKv6L9NpY37HlWkZnBv0"
+                    }
+                }
+            }
+        },
+        {
+            "name": "Combined Hotel Booking API",
+            "request": {
+                "url": "http://localhost:8080/hotels",
+                "method": "DELETE",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    },
+                    {
+                        "key": "User-Agent",
+                        "value": "insomnia/10.1.1"
+                    }
+                ],
+                "auth": {
+                    "type": "bearer",
+                    "bearer": {
+                        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYmEyMWM1NzktNjNkZS00YmM3LWEzOGUtOWYxYzQ5MDdmMTU0Iiwicm9sZSI6IkhPVEVMX01BTkFHRVIiLCJpYXQiOjE3MzE5NTQ1NjIsImV4cCI6MTczMTk1ODE2Mn0.TUeAxD6y7MHNSXtZYZmVPhrsKv6L9NpY37HlWkZnBv0"
+                    }
+                }
+            },
+            "item_": [
+                {
+                "name": "All Hotels",
+                "request": {
+                    "auth": {
+                        "type": "bearer",
+                        "bearer": {
+                            "token": "{{TOKEN}}"
+                        }
+                    },
+                    "method": "GET",
+                    "header": [],
+                    "url": "{{HOTEL_URL}}"
+                },
+                "response": []
+                },
+                {
+                    "name": "Add Feedback",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": {
+                                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjE5Y2ViMmItNTRlYS00ZGExLTg5ZjYtOThjNTA4OWE3YjdkIiwicm9sZSI6IlRSQVZFTEVSIiwiaWF0IjoxNzMyMDM4OTg2LCJleHAiOjE3MzIwNDI1ODZ9.EME-fnfK8FtM3syUEaq9ugAKvQM4cM2patRsFHsyJ18"
+                            }
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\r\n  \"hotel_id\": \"f725afcd-3088-4372-acd7-8ee855515aa7\",\r\n  \"traveler_id\": \"619ceb2b-54ea-4da1-89f6-98c5089a7b7d\",\r\n  \"comments\": \"Very nice!\",\r\n  \"rating\": 4\r\n}\r\n",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": "http://localhost:3002/api/feedback"
+                    },
+              "response": []
+            },
+            {
+              "name": "Get Feedback",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{FEEDBACK_URL}}f725afcd-3088-4372-acd7-8ee855515aa7?sort=date&order=desc",
+                  "host": ["{{FEEDBACK_URL}}f725afcd-3088-4372-acd7-8ee855515aa7"],
+                  "query": [
+                    {"key": "sort", "value": "date"},
+                    {"key": "order", "value": "desc"}
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Feedback",
+              "request": {
+                "method": "GET",
+                "header": []
+              },
+              "response": []
+            },
+            {
+              "name": "get user by id",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "http://localhost:3000/users/a40259b9-0c1c-4fdc-bc1b-b51f3c8846ba"
+              },
+              "response": []
+            },
+            {
+              "name": "DELETE user",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "token": "{{TOKEN}}"
+                  }
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": "{{AUTH_URL}}/api/users/8fc7054a-ab0b-4a6d-b20e-749646705050"
+              },
+              "response": []
+            },
+            {
+              "name": "createHotel (local)",
+              "request": {
+                "url": "http://localhost:8080/hotels",
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "User-Agent",
+                    "value": "insomnia/10.1.1"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Shettys Kitchen Branch 14\",\n  \"location\": \"123 Ocean View Blvd, Beach City\",\n  \"amenities\": {\n    \"wifi\": true,\n    \"pool\": true,\n    \"gym\": false,\n    \"parking\": true,\n    \"spa\": true,\n    \"roomService\": true,\n    \"petFriendly\": false\n  },\n  \"description\": \"A cozy beachside hotel with stunning ocean views and top-notch amenities.\",\n  \"rating\": 4.5,\n  \"managerId\": \"3a15df65-6986-4ae9-84ee-81fca5ecb842\"\n}\n"
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYmEyMWM1NzktNjNkZS00YmM3LWEzOGUtOWYxYzQ5MDdmMTU0Iiwicm9sZSI6IkhPVEVMX01BTkFHRVIiLCJpYXQiOjE3MzE5NTQ1NjIsImV4cCI6MTczMTk1ODE2Mn0.TUeAxD6y7MHNSXtZYZmVPhrsKv6L9NpY37HlWkZnBv0"
+                  }
+                }
+              }
+            },
+            {
+              "name": "getHotels (local)",
+              "request": {
+                "url": "http://localhost:8080/hotels",
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "User-Agent",
+                    "value": "insomnia/10.1.1"
+                  }
+                ],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYmEyMWM1NzktNjNkZS00YmM3LWEzOGUtOWYxYzQ5MDdmMTU0Iiwicm9sZSI6IkhPVEVMX01BTkFHRVIiLCJpYXQiOjE3MzE5NTQ1NjIsImV4cCI6MTczMTk1ODE2Mn0.TUeAxD6y7MHNSXtZYZmVPhrsKv6L9NpY37HlWkZnBv0"
+                  }
+                }
+              }
+            },
+            {
+              "name": "getHotel (local)",
+              "request": {
+                "url": "http://localhost:8080/hotels/f725afcd-3088-4372-acd7-8ee855515aa7",
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "User-Agent",
+                    "value": "insomnia/10.1.1"
+                  }
+                ],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYmEyMWM1NzktNjNkZS00YmM3LWEzOGUtOWYxYzQ5MDdmMTU0Iiwicm9sZSI6IkhPVEVMX01BTkFHRVIiLCJpYXQiOjE3MzE5NTQ1NjIsImV4cCI6MTczMTk1ODE2Mn0.TUeAxD6y7MHNSXtZYZmVPhrsKv6L9NpY37HlWkZnBv0"
+                  }
+                }
+              }
+            },
+            {
+              "name": "deleteHotel (local)",
+              "request": {
+                "url": "http://localhost:8080/hotels/b5d3e348-78a3-4c8e-a0fa-e66e65802af6",
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "User-Agent",
+                    "value": "insomnia/10.1.1"
+                  }
+                ],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYmEyMWM1NzktNjNkZS00YmM3LWEzOGUtOWYxYzQ5MDdmMTU0Iiwicm9sZSI6IkhPVEVMX01BTkFHRVIiLCJpYXQiOjE3MzE5NTQ1NjIsImV4cCI6MTczMTk1ODE2Mn0.TUeAxD6y7MHNSXtZYZmVPhrsKv6L9NpY37HlWkZnBv0"
+                  }
+                }
+              }
+            }
+          ]
+        }
+    ]
+}
