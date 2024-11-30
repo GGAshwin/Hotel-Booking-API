@@ -335,13 +335,11 @@ router.post(
 );
 
 // Simulated Payment Processing
-async function dummyPaymentProcess(
-  payment,
-  authHeader = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjE5Y2ViMmItNTRlYS00ZGExLTg5ZjYtOThjNTA4OWE3YjdkIiwicm9sZSI6IlRSQVZFTEVSIiwiaWF0IjoxNzMyOTU2MzE5LCJleHAiOjE3MzI5NTk5MTl9.EqGlPnkiZ4d38Z9howKkqd2kFpvKXACPMDtfol_ebKE"
-) {
+async function dummyPaymentProcess(payment, authHeader = "") {
   setTimeout(async () => {
     let booking_id;
     payment.status = Math.random() < 0.2 ? "FAILED" : "COMPLETED";
+    // payment.status = "FAILED";
     await payment.save();
     // get the booking by payment
     try {
