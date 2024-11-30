@@ -714,6 +714,5 @@ Retrieve a list of rooms for a specific hotel.
 - **403 Forbidden**: Insufficient permissions.
 - **404 Not Found**: Resource not found.
 - **500 Internal Server Error**: Unexpected server issue.
-
-
+- 
 
