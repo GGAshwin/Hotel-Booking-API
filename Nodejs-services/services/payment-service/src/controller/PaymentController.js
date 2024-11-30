@@ -12,7 +12,7 @@ const AUTH_BASE_URL =
   "https://auth-service.cfapps.us10-001.hana.ondemand.com/auth/verify";
 
 const BOOKING_BASE_URL =
-  "https://booking-service.cfapps.eu12.hana.ondemand.com/bookings";
+  "https://booking-service.cfapps.eu12.hana.ondemand.com/api/bookings";
 
 // Connect to DB
 connectAndSync();
