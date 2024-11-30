@@ -11,7 +11,7 @@ const AUTH_SERVICE_URL = "http://localhost:3000/auth";
 const AUTH_BASE_URL =
   "https://auth-service.cfapps.us10-001.hana.ondemand.com/auth";
 const HOTL_SERVICE_URL =
-  "https://hotel-service.cfapps.eu12.hana.ondemand.com/api/hotels";
+  "https://hotel-service-1.cfapps.eu12.hana.ondemand.com/api";
 // const HOTL_SERVICE_URL = "http://localhost:8080";
 
 // Middleware to verify user role
