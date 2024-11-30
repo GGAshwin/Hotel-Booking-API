@@ -22,7 +22,7 @@ This project is a distributed system for managing hotel bookings, including serv
 
 # Flow Diagram
 
-![Hotel Management System Architecture](design/hotel_management.png)
+![Hotel Management System Architecture](design/hotel_mamagement_new.png)
 
 # Traveller UI Diagram
 
