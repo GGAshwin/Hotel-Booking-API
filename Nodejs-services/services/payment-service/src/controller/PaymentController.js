@@ -357,7 +357,7 @@ async function dummyPaymentProcess(payment, authHeader = "") {
           console.log(booking_obj);
 
           booking_id = booking_obj[0].id;
-          await axios.put(
+          const putBooking = await axios.put(
             `${BOOKING_BASE_URL}`,
             {
               id: booking_obj[0].id,
@@ -378,6 +378,8 @@ async function dummyPaymentProcess(payment, authHeader = "") {
               },
             }
           );
+
+          console.log(putBooking);
         }
       }
     } catch (error) {
