@@ -365,7 +365,8 @@ async function dummyPaymentProcess(payment) {
         }
       }
     } catch (error) {
-      res.status(500).json({ error: "Error from Booking Service" });
+      // res.status(500).json({ error: "Error from Booking Service" });
+      console.error(error);
     }
     // update the payment status in booking
   }, 10000);
