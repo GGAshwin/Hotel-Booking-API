@@ -20,6 +20,10 @@ This project is a distributed system for managing hotel bookings, including serv
 
 [Link to SwaggerHub](https://app.swaggerhub.com/apis/ASHWINPRABHU2001/Hotel_Booking_API/1.0.0)
 
+# Flow Diagram
+
+![Hotel Management System Architecture](design/hotel_management.png)
+
 # Use Case Diagram 
 
 ![hotel drawio](https://github.com/user-attachments/assets/2dbdf5cc-72ed-4dac-8b14-330dd0dd5d5d)
