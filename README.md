@@ -34,8 +34,8 @@ This project is a distributed system for managing hotel bookings, including serv
 ![hotel drawio](https://github.com/user-attachments/assets/2dbdf5cc-72ed-4dac-8b14-330dd0dd5d5d)
 
 # Key Stakeholders
-## 1. Traveler
-## 2. Hotel Manager
+### 1. Traveler
+### 2. Hotel Manager
 
 
 # Auth Service Documentation
