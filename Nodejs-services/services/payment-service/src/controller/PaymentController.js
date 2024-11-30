@@ -343,11 +343,15 @@ async function dummyPaymentProcess(payment) {
     // get the booking by payment
     try {
       const bookingDetails = await axios.get(`${BOOKING_BASE_URL}`);
+      console.log(bookingDetails);
+
       if (bookingDetails.length > 0) {
         let booking_obj = bookingDetails.filter((booking) => {
           return booking.payment_id === payment.payment_id;
         });
         if (booking_obj) {
+          console.log(booking_obj);
+
           booking_id = booking_obj[0].id;
           await axios.put(`${BOOKING_BASE_URL}`, {
             id: booking_obj[0].id,
