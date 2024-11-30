@@ -355,10 +355,9 @@ async function dummyPaymentProcess(payment, authHeader = "") {
         });
         if (booking_obj) {
           console.log(booking_obj);
-
           booking_id = booking_obj[0].id;
           const putBooking = await axios.put(
-            `${BOOKING_BASE_URL}`,
+            `${BOOKING_BASE_URL}/${booking_id}`,
             {
               id: booking_obj[0].id,
               hotelId: booking_obj[0].hotelId,
