@@ -335,7 +335,10 @@ router.post(
 );
 
 // Simulated Payment Processing
-async function dummyPaymentProcess(payment, authHeader = "") {
+async function dummyPaymentProcess(
+  payment,
+  authHeader = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjE5Y2ViMmItNTRlYS00ZGExLTg5ZjYtOThjNTA4OWE3YjdkIiwicm9sZSI6IlRSQVZFTEVSIiwiaWF0IjoxNzMyOTU2MzE5LCJleHAiOjE3MzI5NTk5MTl9.EqGlPnkiZ4d38Z9howKkqd2kFpvKXACPMDtfol_ebKE"
+) {
   setTimeout(async () => {
     let booking_id;
     payment.status = Math.random() < 0.2 ? "FAILED" : "COMPLETED";
@@ -347,14 +350,15 @@ async function dummyPaymentProcess(payment, authHeader = "") {
           Authorization: `${authHeader}`,
         },
       });
-      console.log(bookingDetails);
+      console.log(bookingDetails.data);
 
-      if (bookingDetails.length > 0) {
-        let booking_obj = bookingDetails.filter((booking) => {
+      if (bookingDetails.data.length > 0) {
+        let booking_obj = [];
+        booking_obj = bookingDetails.data.filter((booking) => {
           return booking.payment_id === payment.payment_id;
         });
 
-        if (booking_obj) {
+        if (booking_obj.length > 0) {
           console.log(booking_obj);
           console.log("Booking id here");
 
