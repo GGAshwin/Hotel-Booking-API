@@ -388,13 +388,14 @@ async function dummyPaymentProcess(
           console.log("-----------------------Update happening");
           console.log(putBooking);
         }
+        console.log("did not find payment ID");
       }
     } catch (error) {
       // res.status(500).json({ error: "Error from Booking Service" });
       console.error(error);
     }
     // update the payment status in booking
-  }, 5000);
+  }, 10000);
 }
 
 // Error Handling for Axios
