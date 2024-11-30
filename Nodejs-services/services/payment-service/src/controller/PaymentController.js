@@ -185,7 +185,7 @@ router.post(
         status: "IN_PROGRESS",
       });
 
-      dummyPaymentProcess(newPayment);
+      dummyPaymentProcess(newPayment, req.headers["authorization"]);
 
       res.status(201).json({
         payment_id: newPayment.payment_id,
@@ -335,7 +335,7 @@ router.post(
 );
 
 // Simulated Payment Processing
-async function dummyPaymentProcess(payment) {
+async function dummyPaymentProcess(payment, authHeader = "") {
   setTimeout(async () => {
     let booking_id;
     payment.status = Math.random() < 0.2 ? "FAILED" : "COMPLETED";
@@ -353,19 +353,27 @@ async function dummyPaymentProcess(payment) {
           console.log(booking_obj);
 
           booking_id = booking_obj[0].id;
-          await axios.put(`${BOOKING_BASE_URL}`, {
-            id: booking_obj[0].id,
-            hotelId: booking_obj[0].hotelId,
-            travelerId: booking_obj[0].travelerId,
-            roomType: booking_obj[0].roomType,
-            price: booking_obj[0].price,
-            checkIn: booking_obj[0].checkIn,
-            checkOut: booking_obj[0].checkOut,
-            status: booking_obj[0].status,
-            paymentStatus: payment.status,
-            paymentMethod: booking_obj[0].paymentMethod,
-            paymentId: booking_obj[0].paymentId,
-          });
+          await axios.put(
+            `${BOOKING_BASE_URL}`,
+            {
+              id: booking_obj[0].id,
+              hotelId: booking_obj[0].hotelId,
+              travelerId: booking_obj[0].travelerId,
+              roomType: booking_obj[0].roomType,
+              price: booking_obj[0].price,
+              checkIn: booking_obj[0].checkIn,
+              checkOut: booking_obj[0].checkOut,
+              status: booking_obj[0].status,
+              paymentStatus: payment.status,
+              paymentMethod: booking_obj[0].paymentMethod,
+              paymentId: booking_obj[0].paymentId,
+            },
+            {
+              headers: {
+                Authorization: `${authHeader}`,
+              },
+            }
+          );
         }
       }
     } catch (error) {
