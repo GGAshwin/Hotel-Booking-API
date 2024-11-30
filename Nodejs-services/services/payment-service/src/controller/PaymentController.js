@@ -342,7 +342,11 @@ async function dummyPaymentProcess(payment, authHeader = "") {
     await payment.save();
     // get the booking by payment
     try {
-      const bookingDetails = await axios.get(`${BOOKING_BASE_URL}`);
+      const bookingDetails = await axios.get(`${BOOKING_BASE_URL}`, {
+        headers: {
+          Authorization: `${authHeader}`,
+        },
+      });
       console.log(bookingDetails);
 
       if (bookingDetails.length > 0) {
