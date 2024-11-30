@@ -353,9 +353,13 @@ async function dummyPaymentProcess(payment, authHeader = "") {
         let booking_obj = bookingDetails.filter((booking) => {
           return booking.payment_id === payment.payment_id;
         });
+
         if (booking_obj) {
           console.log(booking_obj);
+          console.log("Booking id here");
+
           booking_id = booking_obj[0].id;
+          console.log(booking_id);
           const putBooking = await axios.put(
             `${BOOKING_BASE_URL}/${booking_id}`,
             {
@@ -377,7 +381,7 @@ async function dummyPaymentProcess(payment, authHeader = "") {
               },
             }
           );
-
+          console.log("-----------------------Update happening");
           console.log(putBooking);
         }
       }
@@ -386,7 +390,7 @@ async function dummyPaymentProcess(payment, authHeader = "") {
       console.error(error);
     }
     // update the payment status in booking
-  }, 10000);
+  }, 5000);
 }
 
 // Error Handling for Axios
