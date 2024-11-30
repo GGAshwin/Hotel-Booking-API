@@ -20,6 +20,10 @@ This project is a distributed system for managing hotel bookings, including serv
 
 [Link to SwaggerHub](https://app.swaggerhub.com/apis/ASHWINPRABHU2001/Hotel_Booking_API/1.0.0)
 
+# Flow Diagram
+
+![Hotel Management System Architecture](design/hotel_management.png)
+
 # Use Case Diagram 
 
 ![hotel drawio](https://github.com/user-attachments/assets/2dbdf5cc-72ed-4dac-8b14-330dd0dd5d5d)
@@ -489,3 +493,230 @@ All endpoints requiring user authentication use a Bearer Token passed in the `Au
   - `403 Forbidden`: Unauthorized access.
   - `404 Not Found`: Feedback not found.
   - `500 Internal Server Error`: Failed to delete feedback.
+
+# Hotel Service API Documentation
+
+This API is part of the Hotel Management System, enabling management of hotel information such as creating, updating, fetching, and deleting hotel data. The API also provides a health check for the service status.
+
+## Prerequisites
+
+### Authentication & Authorization
+
+All endpoints require an Authorization token in the Authorization header:
+
+- Token format: `Bearer <JWT_TOKEN>`
+- Tokens are validated using the Auth Service.
+
+### Roles
+
+Access is restricted based on user roles:
+
+- **TRAVELER**: Regular user accessing hotel information.
+- **HOTEL_MANAGER**: Administrator managing hotel data.
+- **ADMIN**: Superuser with full access to all actions.
+
+---
+
+## Endpoints
+
+### 1. Health Check
+`GET /api/hotels/health`
+
+Returns the status of the hotel service.
+
+#### Response:
+
+- `"Hotel service is up and running!"`
+
+---
+
+### 2. Create a Hotel
+`POST /api/hotels`
+
+Create a new hotel.
+
+#### Required Token:
+- `HOTEL_MANAGER` or `ADMIN`.
+
+#### Request Body:
+- `hotel`: Hotel details to create.
+
+#### Response:
+- Status: `201 Created`
+- Body: `Hotel` object created.
+
+---
+
+### 3. Get All Hotels
+`GET /api/hotels`
+
+Retrieve a list of all hotels.
+
+#### Required Token:
+- `TRAVELER`, `HOTEL_MANAGER`, or `ADMIN`.
+
+#### Response:
+- Status: `200 OK`
+- Body: List of `Hotel` objects.
+
+---
+
+### 4. Get Hotel by ID
+`GET /api/hotels/{id}`
+
+Retrieve a specific hotel by its ID.
+
+#### Required Token:
+- `TRAVELER`, `HOTEL_MANAGER`, or `ADMIN`.
+
+#### Path Parameters:
+- `id`: Hotel ID to retrieve.
+
+#### Response:
+- Status: `200 OK`
+- Body: `Hotel` object for the specified ID.
+
+---
+
+### 5. Update Hotel
+`PUT /api/hotels/{id}`
+
+Update the details of an existing hotel.
+
+#### Required Token:
+- `HOTEL_MANAGER` or `ADMIN`.
+
+#### Path Parameters:
+- `id`: Hotel ID to update.
+
+#### Request Body:
+- `hotel`: Updated hotel details.
+
+#### Response:
+- Status: `200 OK`
+- Body: Updated `Hotel` object.
+
+---
+
+### 6. Delete a Hotel
+`DELETE /api/hotels/{id}`
+
+Delete a specific hotel by its ID.
+
+#### Required Token:
+- `ADMIN`.
+
+#### Path Parameters:
+- `id`: Hotel ID to delete.
+
+#### Response:
+- Status: `200 OK`
+- Body: `"Hotel deleted successfully"`
+
+---
+
+## Error Handling
+
+- **401 Unauthorized**: Invalid or missing token.
+- **403 Forbidden**: Insufficient permissions.
+- **404 Not Found**: Resource not found.
+- **500 Internal Server Error**: Unexpected server issue.
+
+# Room Service API Documentation
+
+This API is part of the Hotel Management System, enabling management of room-related operations for hotels, such as adding rooms, updating room types, and retrieving rooms based on hotel ID. The API also provides a health check for the service status.
+
+## Prerequisites
+
+### Authentication & Authorization
+
+All endpoints require an Authorization token in the Authorization header:
+
+- Token format: `Bearer <JWT_TOKEN>`
+- Tokens are validated using the Auth Service.
+
+### Roles
+
+Access is restricted based on user roles:
+
+- **TRAVELER**: Regular user accessing room information.
+- **HOTEL_MANAGER**: Administrator managing room data.
+- **ADMIN**: Superuser with full access to all actions.
+
+---
+
+## Endpoints
+
+### 1. Health Check
+`GET /api/rooms/health`
+
+Returns the status of the room service.
+
+#### Response:
+- `"Room service is ready to serve!"`
+
+---
+
+### 2. Add a Room
+`POST /api/rooms`
+
+Add a new room to a hotel.
+
+#### Required Token:
+- `HOTEL_MANAGER` or `ADMIN`.
+
+#### Request Body:
+- `hotelId`: ID of the hotel where the room is to be added.
+- `roomType`: Type of the room (e.g., Single, Double).
+
+#### Response:
+- Status: `200 OK`
+- Body: `Room` object created.
+
+---
+
+### 3. Update Room Types by Hotel ID
+`PUT /api/rooms/{hotelId}`
+
+Update the types of rooms for a specific hotel.
+
+#### Required Token:
+- `HOTEL_MANAGER` or `ADMIN`.
+
+#### Path Parameters:
+- `hotelId`: ID of the hotel for which room types need to be updated.
+
+#### Request Body:
+- List of `RoomType` objects to update.
+
+#### Response:
+- Status: `200 OK`
+- Body: Updated `Room` object (optional).
+
+---
+
+### 4. Get Rooms by Hotel ID
+`GET /api/rooms/{hotelId}`
+
+Retrieve a list of rooms for a specific hotel.
+
+#### Required Token:
+- `TRAVELER`, `HOTEL_MANAGER`, or `ADMIN`.
+
+#### Path Parameters:
+- `hotelId`: ID of the hotel to retrieve rooms for.
+
+#### Response:
+- Status: `200 OK`
+- Body: List of `Room` objects.
+
+---
+
+## Error Handling
+
+- **401 Unauthorized**: Invalid or missing token.
+- **403 Forbidden**: Insufficient permissions.
+- **404 Not Found**: Resource not found.
+- **500 Internal Server Error**: Unexpected server issue.
+- 
+

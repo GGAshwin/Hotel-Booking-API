@@ -11,6 +11,9 @@ const USER_BASE_URL =
 const AUTH_BASE_URL =
   "https://auth-service.cfapps.us10-001.hana.ondemand.com/auth/verify";
 
+const BOOKING_BASE_URL =
+  "https://booking-service.cfapps.eu12.hana.ondemand.com/api/bookings";
+
 // Connect to DB
 connectAndSync();
 
@@ -182,7 +185,7 @@ router.post(
         status: "IN_PROGRESS",
       });
 
-      dummyPaymentProcess(newPayment);
+      dummyPaymentProcess(newPayment, req.headers["authorization"]);
 
       res.status(201).json({
         payment_id: newPayment.payment_id,
@@ -332,10 +335,66 @@ router.post(
 );
 
 // Simulated Payment Processing
-async function dummyPaymentProcess(payment) {
+async function dummyPaymentProcess(
+  payment,
+  authHeader = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjE5Y2ViMmItNTRlYS00ZGExLTg5ZjYtOThjNTA4OWE3YjdkIiwicm9sZSI6IlRSQVZFTEVSIiwiaWF0IjoxNzMyOTU2MzE5LCJleHAiOjE3MzI5NTk5MTl9.EqGlPnkiZ4d38Z9howKkqd2kFpvKXACPMDtfol_ebKE"
+) {
   setTimeout(async () => {
+    let booking_id;
     payment.status = Math.random() < 0.2 ? "FAILED" : "COMPLETED";
     await payment.save();
+    // get the booking by payment
+    try {
+      const bookingDetails = await axios.get(`${BOOKING_BASE_URL}`, {
+        headers: {
+          Authorization: `${authHeader}`,
+        },
+      });
+      console.log(bookingDetails.data);
+
+      if (bookingDetails.data.length > 0) {
+        let booking_obj = [];
+        booking_obj = bookingDetails.data.filter((booking) => {
+          return booking.payment_id === payment.payment_id;
+        });
+
+        if (booking_obj.length > 0) {
+          console.log(booking_obj);
+          console.log("Booking id here");
+
+          booking_id = booking_obj[0].id;
+          console.log(booking_id);
+          const putBooking = await axios.put(
+            `${BOOKING_BASE_URL}/${booking_id}`,
+            {
+              id: booking_obj[0].id,
+              hotelId: booking_obj[0].hotelId,
+              travelerId: booking_obj[0].travelerId,
+              roomType: booking_obj[0].roomType,
+              price: booking_obj[0].price,
+              checkIn: booking_obj[0].checkIn,
+              checkOut: booking_obj[0].checkOut,
+              status: booking_obj[0].status,
+              paymentStatus: payment.status,
+              paymentMethod: booking_obj[0].paymentMethod,
+              paymentId: booking_obj[0].paymentId,
+            },
+            {
+              headers: {
+                Authorization: `${authHeader}`,
+              },
+            }
+          );
+          console.log("-----------------------Update happening");
+          console.log(putBooking);
+        }
+        console.log("did not find payment ID");
+      }
+    } catch (error) {
+      // res.status(500).json({ error: "Error from Booking Service" });
+      console.error(error);
+    }
+    // update the payment status in booking
   }, 10000);
 }
 
