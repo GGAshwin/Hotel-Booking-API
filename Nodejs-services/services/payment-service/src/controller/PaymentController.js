@@ -11,6 +11,9 @@ const USER_BASE_URL =
 const AUTH_BASE_URL =
   "https://auth-service.cfapps.us10-001.hana.ondemand.com/auth/verify";
 
+const BOOKING_BASE_URL =
+  "https://booking-service.cfapps.eu12.hana.ondemand.com/bookings";
+
 // Connect to DB
 connectAndSync();
 
@@ -334,8 +337,37 @@ router.post(
 // Simulated Payment Processing
 async function dummyPaymentProcess(payment) {
   setTimeout(async () => {
+    let booking_id;
     payment.status = Math.random() < 0.2 ? "FAILED" : "COMPLETED";
     await payment.save();
+    // get the booking by payment
+    try {
+      const bookingDetails = await axios.get(`${BOOKING_BASE_URL}`);
+      if (bookingDetails.length > 0) {
+        let booking_obj = bookingDetails.filter((booking) => {
+          return booking.payment_id === payment.payment_id;
+        });
+        if (booking_obj) {
+          booking_id = booking_obj[0].id;
+          await axios.put(`${BOOKING_BASE_URL}`, {
+            id: booking_obj[0].id,
+            hotelId: booking_obj[0].hotelId,
+            travelerId: booking_obj[0].travelerId,
+            roomType: booking_obj[0].roomType,
+            price: booking_obj[0].price,
+            checkIn: booking_obj[0].checkIn,
+            checkOut: booking_obj[0].checkOut,
+            status: booking_obj[0].status,
+            paymentStatus: payment.status,
+            paymentMethod: booking_obj[0].paymentMethod,
+            paymentId: booking_obj[0].paymentId,
+          });
+        }
+      }
+    } catch (error) {
+      res.status(500).json({ error: "Error from Booking Service" });
+    }
+    // update the payment status in booking
   }, 10000);
 }
 
