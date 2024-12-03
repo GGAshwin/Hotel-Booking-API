@@ -200,40 +200,17 @@ paths:
         '500':
           description: Server error
   /api/payments:
-    post:
-      tags:
-        - Payment
-      summary: Make a payment
-      description: >
-        Endpoint for making payemnt. Stakeholder access:
-        - `TRAVELER`
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/api_payments_body'
-        required: true
-      responses:
-        '201':
-          description: Payment created successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Payment'
-        '400':
-          description: Bad request
-        '500':
-          description: Server error
     get:
       tags:
         - Payment
-      summary: Retrieve payments with optional filters
+      summary: Retrieve payments with optional filters and pagination
       description: >
         Fetch payments based on various filters like payment ID, traveler ID,
         status, and sort order. Travelers can only view their own payments.
         Endpoint for retrieving payment statuses. Stakeholder access:
         - **TRAVELER**: Can only retrieve their own payments.
         - **HOTEL_MANAGER**: Can retrieve all payments.
+        Supports pagination for large datasets.
       parameters:
         - name: payment_id
           in: query
@@ -276,6 +253,22 @@ paths:
               - ASC
               - DESC
           description: Sort order, either ascending (ASC) or descending (DESC) (default is ASC)
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: The page number to retrieve (default is 1)
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
+          description: The number of results to return per page (default is 10)
       responses:
         '200':
           description: List of payments retrieved successfully
@@ -288,6 +281,21 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Payment'
+                  pagination:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        description: Current page number
+                      total_pages:
+                        type: integer
+                        description: Total number of pages available
+                      total_items:
+                        type: integer
+                        description: Total number of items available
+                      items_per_page:
+                        type: integer
+                        description: Number of items per page
         '403':
           description: Travelers can only view their own payments
         '404':
@@ -297,6 +305,30 @@ paths:
       security:
         - bearerAuth: []
 
+    post:
+      tags:
+        - Payment
+      summary: Make a payment
+      description: >
+        Endpoint for making payemnt. Stakeholder access:
+        - `TRAVELER`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/api_payments_body'
+        required: true
+      responses:
+        '201':
+          description: Payment created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
   /api/payments/{id}:
     get:
       tags:
@@ -403,6 +435,73 @@ paths:
         '500':
           description: Server error
   /api/feedback:
+    get:
+      tags:
+        - Feedback
+      summary: Get feedback for all hotels with pagination
+      description: >
+        Retrieve all feedback from all hotels sorted by the latest feedback first.
+        Stakeholder access:
+        - `TRAVELER`
+        - `HOTEL_MANAGER`
+        Supports pagination to limit the number of feedback entries per request.
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+          description: The page number to retrieve (default is 1)
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+          description: The number of feedback entries per page (default is 10)
+      responses:
+        '200':
+          description: Paginated list of feedback
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  feedback:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Feedback'
+                  pagination:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        description: The current page number
+                      total_pages:
+                        type: integer
+                        description: The total number of pages available
+                      total_items:
+                        type: integer
+                        description: The total number of feedback entries available
+                      items_per_page:
+                        type: integer
+                        description: The number of feedback entries per page
+        '500':
+          description: Failed to retrieve feedback for all hotels
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  details:
+                    type: string
+      security:
+        - bearerAuth: []
+
+        
     post:
       tags:
         - Feedback
@@ -427,38 +526,6 @@ paths:
           description: Invalid feedback data or hotel not found
         '403':
           description: Only travelers can add feedback
-      security:
-        - bearerAuth: []
-        
-    get:
-      tags:
-        - Feedback
-      summary: Get feedback for all hotels
-      description: >
-        Retrieve all feedback from all hotels sorted by the latest feedback first.
-        Stakeholder access:
-        - `TRAVELER`
-        - `HOTEL_MANAGER`
-      responses:
-        '200':
-          description: List of all feedback
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Feedback'
-        '500':
-          description: Failed to retrieve feedback for all hotels
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                  details:
-                    type: string
       security:
         - bearerAuth: []
       
@@ -523,20 +590,56 @@ paths:
           description: Feedback not found
       security:
         - bearerAuth: []
-  /hotels:
+  /api/hotels:
     get:
       tags:
         - Hotels
-      summary: Returns a list of all hotels
+      summary: Returns a paginated list of hotels
+      description: >
+        Retrieve a list of hotels with optional pagination. Specify the `page` and `limit`
+        query parameters to control the number of results per page and the page to fetch.
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+          description: The page number to retrieve (default is 1)
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+          description: The number of hotels to retrieve per page (default is 10)
       responses:
         '200':
-          description: A list of hotels
+          description: A paginated list of hotels
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Hotel'
+                type: object
+                properties:
+                  hotels:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Hotel'
+                  pagination:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        description: The current page number
+                      total_pages:
+                        type: integer
+                        description: The total number of pages available
+                      total_items:
+                        type: integer
+                        description: The total number of hotels available
+                      items_per_page:
+                        type: integer
+                        description: The number of hotels per page
         '401':
           description: Unauthorized - Missing or invalid JWT token
         '403':
@@ -545,6 +648,7 @@ paths:
           description: Service is down. Our dev team is on it
       security:
         - bearerAuth: []
+
     post:
       tags:
         - Hotels
@@ -575,7 +679,7 @@ paths:
           description: Service is down. We will be up soon
       security:
         - bearerAuth: []
-  /hotels/{hotelId}:
+  /api/hotels/{hotelId}:
     get:
       tags:
         - Hotels
@@ -638,7 +742,7 @@ paths:
           description: Service is down. We are working on it
       security:
         - bearerAuth: []
-  /bookings:
+  /api/bookings:
     post:
       tags:
         - Bookings
@@ -677,7 +781,7 @@ paths:
           description: Server error
       security:
         - bearerAuth: []
-  /bookings/{id}:
+  /api/bookings/{id}:
     get:
       tags:
         - Bookings
@@ -740,7 +844,7 @@ paths:
           description: Server error
       security:
         - bearerAuth: []
-  /rooms/{id}/types:
+  /api/rooms/{id}/types:
     get:
       tags:
         - Rooms
@@ -799,7 +903,7 @@ paths:
           description: Hotel not found
         '500':
           description: Server error
-  /rooms:
+  /api/rooms:
     post:
       tags:
         - Rooms
@@ -821,21 +925,21 @@ paths:
           description: Bad request - Invalid or missing fields
         '500':
           description: Server error
-  /health:
-    get:
-      tags:
-        - Health Check
-      summary: Check service health
-      responses:
-        '200':
-          description: Service is healthy
-          content:
-            application/json:
-              schema:
-                type: string
-                example: Service is healthy
-        '500':
-          description: Service is down
+  # /health:
+  #   get:
+  #     tags:
+  #       - Health Check
+  #     summary: Check service health
+  #     responses:
+  #       '200':
+  #         description: Service is healthy
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: string
+  #               example: Service is healthy
+  #       '500':
+  #         description: Service is down
 components:
   schemas:
     Hotel:
