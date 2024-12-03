@@ -76,9 +76,25 @@ router.get(
       status,
       order_by = "created_at",
       order = "ASC",
+      page = 1,
+      limit = 10,
     } = req.query;
 
     try {
+      // Validate limit and page
+      const pageNumber = parseInt(page, 10);
+      const limitNumber = parseInt(limit, 10);
+
+      if (isNaN(pageNumber) || pageNumber < 1) {
+        return res.status(400).json({ error: "Invalid page number." });
+      }
+
+      if (isNaN(limitNumber) || limitNumber < 1) {
+        return res.status(400).json({ error: "Invalid limit value." });
+      }
+
+      const offset = (pageNumber - 1) * limitNumber;
+
       const whereClause = {};
 
       if (payment_id) whereClause.payment_id = payment_id;
@@ -95,18 +111,22 @@ router.get(
         whereClause.traveler_id = traveler_id;
       }
 
-      const payments = await Payment.findAll({
-        where: whereClause,
-        attributes: [
-          "payment_id",
-          "traveler_id",
-          "amount",
-          "payment_method",
-          "status",
-          "created_at",
-        ],
-        order: [[order_by, order.toUpperCase()]],
-      });
+      // Fetch payments with pagination
+      const { rows: payments, count: totalItems } =
+        await Payment.findAndCountAll({
+          where: whereClause,
+          attributes: [
+            "payment_id",
+            "traveler_id",
+            "amount",
+            "payment_method",
+            "status",
+            "created_at",
+          ],
+          order: [[order_by, order.toUpperCase()]],
+          limit: limitNumber,
+          offset: offset,
+        });
 
       if (!payments || payments.length === 0) {
         return res
@@ -114,8 +134,16 @@ router.get(
           .json({ error: "No payments found matching the criteria." });
       }
 
+      const totalPages = Math.ceil(totalItems / limitNumber);
+
       res.status(200).json({
         payments,
+        pagination: {
+          current_page: pageNumber,
+          total_pages: totalPages,
+          total_items: totalItems,
+          items_per_page: limitNumber,
+        },
       });
     } catch (error) {
       console.error("Error fetching payments:", error);
