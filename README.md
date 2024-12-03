@@ -2,11 +2,11 @@
 
 By,
 
-*   GG Ashwin Prabhu
-*   Sharan Kumar
-*   Rimika Bhaumik
-*   Sthuthi B
-*   Harshvardhan Jaiswal
+*   GG Ashwin Prabhu - 2023SL93007
+*   Sharan Kumar - 2023SL93066
+*   Rimika Bhaumik - 2023SL93097
+*   Sthuthi B - 2023SL93066
+*   Harshvardhan Jaiswal - 2023SL93061
 
 This project is a distributed system for managing hotel bookings, including services for authentication, payments, and feedback. Each service runs independently to ensure scalability and modularity.
 
