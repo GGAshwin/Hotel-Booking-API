@@ -4,15 +4,15 @@ const router = express.Router();
 const Joi = require("joi");
 const axios = require("axios");
 
-// const USER_BASE_URL = "http://localhost:3000/api/users";
-const USER_BASE_URL =
-  "https://auth-service.cfapps.us10-001.hana.ondemand.com/api/users";
-// const AUTH_BASE_URL = "http://localhost:3000/auth/verify";
-const AUTH_BASE_URL =
-  "https://auth-service.cfapps.us10-001.hana.ondemand.com/auth/verify";
+const USER_BASE_URL = "http://localhost:3000/api/users";
+// const USER_BASE_URL =
+// "https://auth-service.cfapps.us10-001.hana.ondemand.com/api/users";
+const AUTH_BASE_URL = "http://localhost:3000/auth/verify";
+// const AUTH_BASE_URL =
+// "https://auth-service.cfapps.us10-001.hana.ondemand.com/auth/verify";
 
 const BOOKING_BASE_URL =
-  "https://booking-service.cfapps.eu12.hana.ondemand.com/bookings";
+  "https://booking-service.cfapps.eu12.hana.ondemand.com/api/bookings";
 
 // Connect to DB
 connectAndSync();
@@ -76,9 +76,25 @@ router.get(
       status,
       order_by = "created_at",
       order = "ASC",
+      page = 1,
+      limit = 10,
     } = req.query;
 
     try {
+      // Validate limit and page
+      const pageNumber = parseInt(page, 10);
+      const limitNumber = parseInt(limit, 10);
+
+      if (isNaN(pageNumber) || pageNumber < 1) {
+        return res.status(400).json({ error: "Invalid page number." });
+      }
+
+      if (isNaN(limitNumber) || limitNumber < 1) {
+        return res.status(400).json({ error: "Invalid limit value." });
+      }
+
+      const offset = (pageNumber - 1) * limitNumber;
+
       const whereClause = {};
 
       if (payment_id) whereClause.payment_id = payment_id;
@@ -95,18 +111,22 @@ router.get(
         whereClause.traveler_id = traveler_id;
       }
 
-      const payments = await Payment.findAll({
-        where: whereClause,
-        attributes: [
-          "payment_id",
-          "traveler_id",
-          "amount",
-          "payment_method",
-          "status",
-          "created_at",
-        ],
-        order: [[order_by, order.toUpperCase()]],
-      });
+      // Fetch payments with pagination
+      const { rows: payments, count: totalItems } =
+        await Payment.findAndCountAll({
+          where: whereClause,
+          attributes: [
+            "payment_id",
+            "traveler_id",
+            "amount",
+            "payment_method",
+            "status",
+            "created_at",
+          ],
+          order: [[order_by, order.toUpperCase()]],
+          limit: limitNumber,
+          offset: offset,
+        });
 
       if (!payments || payments.length === 0) {
         return res
@@ -114,8 +134,16 @@ router.get(
           .json({ error: "No payments found matching the criteria." });
       }
 
+      const totalPages = Math.ceil(totalItems / limitNumber);
+
       res.status(200).json({
         payments,
+        pagination: {
+          current_page: pageNumber,
+          total_pages: totalPages,
+          total_items: totalItems,
+          items_per_page: limitNumber,
+        },
       });
     } catch (error) {
       console.error("Error fetching payments:", error);
@@ -185,7 +213,7 @@ router.post(
         status: "IN_PROGRESS",
       });
 
-      dummyPaymentProcess(newPayment);
+      dummyPaymentProcess(newPayment, req.headers["authorization"]);
 
       res.status(201).json({
         payment_id: newPayment.payment_id,
@@ -335,34 +363,58 @@ router.post(
 );
 
 // Simulated Payment Processing
-async function dummyPaymentProcess(payment) {
+async function dummyPaymentProcess(payment, authHeader = "") {
   setTimeout(async () => {
     let booking_id;
     payment.status = Math.random() < 0.2 ? "FAILED" : "COMPLETED";
+    // payment.status = "FAILED";
     await payment.save();
     // get the booking by payment
     try {
-      const bookingDetails = await axios.get(`${BOOKING_BASE_URL}`);
-      if (bookingDetails.length > 0) {
-        let booking_obj = bookingDetails.filter((booking) => {
+      const bookingDetails = await axios.get(`${BOOKING_BASE_URL}`, {
+        headers: {
+          Authorization: `${authHeader}`,
+        },
+      });
+      console.log(bookingDetails.data);
+
+      if (bookingDetails.data.length > 0) {
+        let booking_obj = [];
+        booking_obj = bookingDetails.data.filter((booking) => {
           return booking.payment_id === payment.payment_id;
         });
-        if (booking_obj) {
+
+        if (booking_obj.length > 0) {
+          console.log(booking_obj);
+          console.log("Booking id here");
+
           booking_id = booking_obj[0].id;
-          await axios.put(`${BOOKING_BASE_URL}`, {
-            id: booking_obj[0].id,
-            hotelId: booking_obj[0].hotelId,
-            travelerId: booking_obj[0].travelerId,
-            roomType: booking_obj[0].roomType,
-            price: booking_obj[0].price,
-            checkIn: booking_obj[0].checkIn,
-            checkOut: booking_obj[0].checkOut,
-            status: booking_obj[0].status,
-            paymentStatus: payment.status,
-            paymentMethod: booking_obj[0].paymentMethod,
-            paymentId: booking_obj[0].paymentId,
-          });
+          console.log(booking_id);
+          const putBooking = await axios.put(
+            `${BOOKING_BASE_URL}/${booking_id}`,
+            {
+              id: booking_obj[0].id,
+              hotelId: booking_obj[0].hotelId,
+              travelerId: booking_obj[0].travelerId,
+              roomType: booking_obj[0].roomType,
+              price: booking_obj[0].price,
+              checkIn: booking_obj[0].checkIn,
+              checkOut: booking_obj[0].checkOut,
+              status: booking_obj[0].status,
+              paymentStatus: payment.status,
+              paymentMethod: booking_obj[0].paymentMethod,
+              paymentId: booking_obj[0].paymentId,
+            },
+            {
+              headers: {
+                Authorization: `${authHeader}`,
+              },
+            }
+          );
+          console.log("-----------------------Update happening");
+          console.log(putBooking);
         }
+        console.log("did not find payment ID");
       }
     } catch (error) {
       // res.status(500).json({ error: "Error from Booking Service" });

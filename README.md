@@ -2,11 +2,11 @@
 
 By,
 
-*   GG Ashwin Prabhu
-*   Sharan Kumar
-*   Rimika Bhaumik
-*   Sthuthi B
-*   Harshvardhan Jaiswal
+*   GG Ashwin Prabhu - 2023SL93007
+*   Sharan Kumar - 2023SL93066
+*   Rimika Bhaumik - 2023SL93097
+*   Sthuthi B - 2023SL93066
+*   Harshvardhan Jaiswal - 2023SL93061
 
 This project is a distributed system for managing hotel bookings, including services for authentication, payments, and feedback. Each service runs independently to ensure scalability and modularity.
 
@@ -20,10 +20,22 @@ This project is a distributed system for managing hotel bookings, including serv
 
 [Link to SwaggerHub](https://app.swaggerhub.com/apis/ASHWINPRABHU2001/Hotel_Booking_API/1.0.0)
 
+# Flow Diagram
+
+![Hotel Management System Architecture](design/hotel_mamagement_new.png)
+
+# Traveller UI Diagram
+
+![Traveler Interface Flow](design/Traveller_UI_Flow.png)
+
+
 # Use Case Diagram 
 
 ![hotel drawio](https://github.com/user-attachments/assets/2dbdf5cc-72ed-4dac-8b14-330dd0dd5d5d)
 
+# Key Stakeholders
+### 1. Traveler
+### 2. Hotel Manager
 
 
 # Auth Service Documentation

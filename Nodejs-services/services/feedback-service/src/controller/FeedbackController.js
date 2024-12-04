@@ -6,12 +6,12 @@ const router = express.Router();
 
 connectAndSync();
 
-// const AUTH_SERVICE_URL = "http://localhost:3000/auth";
-const AUTH_SERVICE_URL =
-  "https://auth-service.cfapps.us10-001.hana.ondemand.com/auth";
-const HOTL_SERVICE_URL =
-  "https://hotel-service-1.cfapps.eu12.hana.ondemand.com/api";
-// const HOTL_SERVICE_URL = "http://localhost:8080";
+const AUTH_SERVICE_URL = "http://localhost:3000/auth";
+// const AUTH_SERVICE_URL =
+// "https://auth-service.cfapps.us10-001.hana.ondemand.com/auth";
+// const HOTL_SERVICE_URL =
+// "https://hotel-service-1.cfapps.eu12.hana.ondemand.com/api";
+const HOTL_SERVICE_URL = "http://localhost:8081/api";
 
 // Middleware to verify user role
 async function verifyUserRole(token, expectedRole) {
@@ -158,19 +158,29 @@ router.get("/:hotel_id", async (req, res) => {
 router.get("/", async (req, res) => {
   try {
     const feedbacks = await Feedback.findAll({
-      attributes: ["id", "hotel_id", "traveler_id", "comments", "rating", "created_at"],
+      attributes: [
+        "id",
+        "hotel_id",
+        "traveler_id",
+        "comments",
+        "rating",
+        "created_at",
+      ],
       order: [["created_at", "DESC"]],
     });
 
     if (feedbacks.length === 0) {
-      return res.status(200).json({ message: "No feedback available for any hotel" });
+      return res
+        .status(200)
+        .json({ message: "No feedback available for any hotel" });
     }
 
     res.status(200).json(feedbacks);
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: "Failed to retrieve feedback for all hotels", details: error });
+    res.status(500).json({
+      error: "Failed to retrieve feedback for all hotels",
+      details: error,
+    });
   }
 });
 
