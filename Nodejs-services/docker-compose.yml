@@ -1,43 +1,34 @@
 version: '3.9'
 services:
-  app1:
+  auth:
     build:
       context: ./services/auth-service
       dockerfile: Dockerfile
-    container_name: auth-service
+    container_name: ggashwin/auth-service
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=production
     command: npm start
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
 
-  app2:
+  payment:
     build:
       context: ./services/payment-service
       dockerfile: Dockerfile
-    container_name: node_app2
+    container_name: ggashwin/payment-service
     ports:
       - "3001:3001"
     environment:
       - NODE_ENV=production
     command: npm start
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
 
-  app3:
+  feedback:
     build:
       context: ./services/feedback-service
       dockerfile: Dockerfile
-    container_name: node_app3
+    container_name: ggashwin/feedback-service
     ports:
       - "3002:3002"
     environment:
       - NODE_ENV=production
     command: npm start
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
