@@ -13,6 +13,7 @@ router.post("/register", async (req, res) => {
   try {
     const { first_name, last_name, email, password } = req.body;
     let { role } = req.body;
+    console.log(req.body);
 
     // Check for missing fields
     if (!first_name || !last_name || !email || !password) {
