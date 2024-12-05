@@ -27,6 +27,10 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ error: "Email already in use." });
     }
 
+    if (role !== "TRAVELER" && role !== "HOTEL_MANAGER") {
+      role = "TRAVELER";
+    }
+
     // make the role default to traveler
     if (!role) {
       role = "TRAVELER";
