@@ -7,13 +7,15 @@ const router = express.Router();
 connectAndSync();
 
 const AUTH_SERVICE_URL = "http://localhost:3000/auth";
-// const HOTL_SERVICE_URL = 'https://hotel-service.cfapps.eu12.hana.ondemand.com/hotels/'
-const HOTL_SERVICE_URL = "http://localhost:8080";
+// const AUTH_SERVICE_URL =
+// "https://auth-service.cfapps.us10-001.hana.ondemand.com/auth";
+// const HOTL_SERVICE_URL =
+// "https://hotel-service-1.cfapps.eu12.hana.ondemand.com/api";
+const HOTL_SERVICE_URL = "http://localhost:8081/api";
 
 // Middleware to verify user role
 async function verifyUserRole(token, expectedRole) {
   try {
-    // Ensure the token is being passed properly
     if (!token) {
       throw new Error("Token is missing");
     }
@@ -27,7 +29,6 @@ async function verifyUserRole(token, expectedRole) {
     );
     const { role } = verifyResponse.data;
 
-    // Ensure role matches the expected role
     if (role !== expectedRole) {
       throw new Error(`Expected role ${expectedRole}, but got ${role}`);
     }
@@ -38,27 +39,50 @@ async function verifyUserRole(token, expectedRole) {
   }
 }
 
+// Helper function to generate a token for a service account
 async function generateUserToken() {
   try {
     const traveler_token = await axios.post(`${AUTH_SERVICE_URL}/login`, {
       email: "service_account.traveler@example.com",
       password: "service_account_secret",
     });
-  
+
     return traveler_token.data.token;
   } catch (error) {
-    console.error('User not found');
-    return;
+    console.error("Error generating user token:", error.message || error);
+    return null;
   }
+}
+
+// Helper function to check if a hotel exists
+async function checkIfHotelExists(hotel_id, token) {
+  try {
+    const response = await axios.get(`${HOTL_SERVICE_URL}/hotels/${hotel_id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log(response);
+
+    if (response.status === 200 && response.data) {
+      return response.data; // Return the hotel data if it exists
+    }
+  } catch (error) {
+    console.log(error);
+
+    console.error("Error checking hotel existence:", error.message || error);
+  }
+  return null; // Return null if the hotel doesn't exist or there's an error
 }
 
 // Add feedback for a hotel (only for users with role: TRAVELER)
 router.post("/", async (req, res) => {
   const { hotel_id, traveler_id, comments, rating } = req.body;
-  const token = req.headers.authorization?.split(" ")[1]; // Assuming Bearer token
+  const token = req.headers.authorization?.split(" ")[1];
 
-  // Verify the user role as TRAVELER
   const isTraveler = await verifyUserRole(token, "TRAVELER");
+  console.log(isTraveler);
 
   if (!isTraveler) {
     return res.status(403).json({
@@ -66,25 +90,11 @@ router.post("/", async (req, res) => {
     });
   }
 
-  // Check if hotel exists
-
-  let existingHotel = await axios.get(
-    `${HOTL_SERVICE_URL}/hotels/${hotel_id}`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-
-  console.log(existingHotel);
-  
-
-  if (!existingHotel.data) {
-    return res.status(400).json({ error: "Hotel not found" });
+  let hotel = await checkIfHotelExists(hotel_id, token);
+  if (!hotel) {
+    return res.status(404).json({ error: "Hotel not found" });
   }
 
-  // Check if feedback already exists for the traveler and hotel
   const existingFeedback = await Feedback.findOne({
     where: { hotel_id, traveler_id },
   });
@@ -112,34 +122,22 @@ router.post("/", async (req, res) => {
 router.get("/:hotel_id", async (req, res) => {
   const hotel_id = req.params.hotel_id;
   const { sort = "date", order = "desc" } = req.query;
-  // have to generate send the traveler token too
 
   try {
     let token_traveler = await generateUserToken();
+    const hotel = await checkIfHotelExists(hotel_id, token_traveler);
 
-    let existingHotel = await axios.get(
-      `${HOTL_SERVICE_URL}/hotels/${hotel_id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token_traveler}`,
-        },
-      }
-    );
-    console.log(existingHotel.data);
-
-    // Check if hotel exists
-    if (existingHotel.status !== 200 || !existingHotel.data) {
+    if (!hotel) {
       return res.status(404).json({ error: "Hotel not found" });
     }
 
-    // Determine the column to sort by and the order direction
     const orderColumn = sort === "rating" ? "rating" : "created_at";
     const orderDirection = order.toLowerCase() === "asc" ? "ASC" : "DESC";
 
     const feedbacks = await Feedback.findAll({
       where: { hotel_id },
       attributes: ["id", "traveler_id", "comments", "rating", "created_at"],
-      order: [[orderColumn, orderDirection]], // Order by date (created_at) or rating as specified
+      order: [[orderColumn, orderDirection]],
     });
 
     if (feedbacks.length === 0) {
@@ -156,31 +154,82 @@ router.get("/:hotel_id", async (req, res) => {
   }
 });
 
-// Delete feedback by ID (Only HOTEL_MANAGER can delete)
-router.delete("/:id", async (req, res) => {
-  const token = req.headers.authorization?.split(" ")[1];
+// Get feedback for all hotels
+router.get("/", async (req, res) => {
+  try {
+    const feedbacks = await Feedback.findAll({
+      attributes: [
+        "id",
+        "hotel_id",
+        "traveler_id",
+        "comments",
+        "rating",
+        "created_at",
+      ],
+      order: [["created_at", "DESC"]],
+    });
 
-  // Verify the user role as HOTEL_MANAGER
-  const isHotelManager = await verifyUserRole(token, "HOTEL_MANAGER");
-  if (!isHotelManager) {
-    return res.status(403).json({
-      error: "Only users with the role of HOTEL_MANAGER can delete feedback",
+    if (feedbacks.length === 0) {
+      return res
+        .status(200)
+        .json({ message: "No feedback available for any hotel" });
+    }
+
+    res.status(200).json(feedbacks);
+  } catch (error) {
+    res.status(500).json({
+      error: "Failed to retrieve feedback for all hotels",
+      details: error,
     });
   }
+});
 
-  const id = req.params.id;
+// Delete feedback by ID (Only HOTEL_MANAGER can delete any feedback, or TRAVELER can delete their own feedback)
+router.delete("/:id", async (req, res) => {
+  const token = req.headers.authorization?.split(" ")[1]; // Extract the Bearer token
+  const feedbackId = req.params.id; // Feedback ID from the URL parameter
 
   try {
-    const result = await Feedback.destroy({ where: { id } });
-    if (result) {
-      res.status(200).json({ message: "Feedback deleted successfully" });
+    // Verify the user's role and get user_id from the verification response
+    const verifyResponse = await axios.post(
+      `${AUTH_SERVICE_URL}/verify`,
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    const { role, userId: userId } = verifyResponse.data;
+    console.log(verifyResponse.data);
+
+    // Fetch the feedback record using the feedback ID
+    const feedback = await Feedback.findOne({ where: { id: feedbackId } });
+
+    // If feedback does not exist, return 404
+    if (!feedback) {
+      return res.status(404).json({ error: "Feedback not found" });
+    }
+
+    // Authorization logic:
+    // - HOTEL_MANAGER can delete any feedback
+    // - TRAVELER can delete their own feedback only
+    if (
+      role === "HOTEL_MANAGER" ||
+      (role === "TRAVELER" && feedback.traveler_id === userId)
+    ) {
+      // Delete the feedback
+      await Feedback.destroy({ where: { id: feedbackId } });
+      return res.status(200).json({ message: "Feedback deleted successfully" });
     } else {
-      res.status(404).json({ error: "Feedback not found" });
+      // Unauthorized access
+      return res.status(403).json({
+        error: "You are not authorized to delete this feedback",
+      });
     }
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: "Failed to delete feedback", details: error });
+    // Handle errors gracefully
+    console.error("Error during feedback deletion:", error.message || error);
+    return res.status(500).json({
+      error: "Failed to delete feedback",
+      details: error.message || error,
+    });
   }
 });
 
