@@ -1,5 +1,9 @@
 @if(!showBusy){
-<div></div>
+<div>
+  <p-calendar [(ngModel)]="fromDate" />
+  <p-calendar [(ngModel)]="toDate" />
+  {{ fromDate }}
+</div>
 <div class="flex-display">
   @for (room of hotelRoomsData; track room) {
   <p-card
@@ -19,6 +23,7 @@
     <ng-template pTemplate="footer">
       <div class="flex gap-3 mt-1">
         <p-button
+          (onClick)="makeBooking(room.type, room.price)"
           label="Book Now"
           class="w-full full"
           [rounded]="true"

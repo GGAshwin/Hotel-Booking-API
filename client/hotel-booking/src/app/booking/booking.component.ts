@@ -12,18 +12,10 @@ export class BookingComponent implements OnInit {
   hotelId!: string;
   hotelObj!: Hotel;
   hotelRoomsData: any = [];
+  fromDate: any;
+  toDate: any;
 
-  bookingObj = {
-    hotelId: this.hotelId,
-    travelerId: localStorage.getItem('userId'),
-    roomType: 'DELUXE',
-    price: 1234,
-    checkIn: '2024-12-01',
-    checkOut: '2024-12-07',
-    status: 'PENDING',
-    paymentStatus: 'PENDING',
-    paymentMethod: 'CREDIT',
-  };
+  bookingObj = {};
 
   showBusy = true;
   constructor(
@@ -59,9 +51,35 @@ export class BookingComponent implements OnInit {
       .getRoomAssociatedWithHotel(this.hotelId)
       .subscribe((roomsData: any) => {
         console.log(roomsData);
-
         this.hotelRoomsData = roomsData[0].roomType;
         console.log(this.hotelRoomsData);
       });
+  }
+
+  makeBooking(roomType: string, roomPrice: number) {
+    this.fromDate = new Date(this.fromDate);
+    this.fromDate = this.fromDate.toISOString().split('T')[0];
+
+    this.toDate = new Date(this.toDate);
+    this.toDate = this.toDate.toISOString().split('T')[0];
+    console.log(this.fromDate, this.toDate);
+
+    this.bookingObj = {
+      hotelId: this.hotelId,
+      travelerId: localStorage.getItem('userId'),
+      checkIn: this.fromDate,
+      checkOut: this.toDate,
+      status: 'PENDING',
+      paymentStatus: 'PENDING',
+      paymentMethod: 'CREDIT',
+      roomType: roomType,
+      price: roomPrice,
+    };
+    this.utilService.makeBooking(this.bookingObj).subscribe((res) => {
+      console.log(res);
+      if (res) {
+        //do something
+      }
+    });
   }
 }

@@ -11,6 +11,7 @@ import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { BookingComponent } from './booking/booking.component';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { CalendarModule } from 'primeng/calendar';
 
 @NgModule({
   declarations: [AppComponent, LoginComponent, HomeComponent, BookingComponent],
@@ -23,6 +24,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
     CardModule,
     ButtonModule,
     ProgressSpinnerModule,
+    CalendarModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

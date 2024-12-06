@@ -56,6 +56,12 @@ export class UtilService {
     });
   }
 
+  makeBooking(payload: any) {
+    return this.http.post(`${this.BOOKING_BASE_URL}`, payload, {
+      headers: this.createHeaders(),
+    });
+  }
+
   createHeaders() {
     const header = { Authorization: `Bearer ${this.authToken}` };
     console.log(header);
