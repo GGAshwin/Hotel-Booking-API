@@ -1,0 +1,43 @@
+@if (hotelArray.length > 0) {
+<div class="flex-display">
+  @for (hotel of hotelArray; track hotel) {
+  <p-card
+    header="{{ hotel.name }}"
+    subheader="Card Subheader"
+    [style]="{ width: '360px' }"
+  >
+    <!-- <ng-template pTemplate="header">
+                    <img
+                      alt="Card"
+                      src="https://primefaces.org/cdn/primeng/images/card-ng.jpg"
+                    />
+                  </ng-template> -->
+    <p>
+      {{ hotel.location }}
+    </p>
+    <ng-template pTemplate="footer">
+      <div class="flex gap-3 mt-1">
+        <p-button
+          (onClick)="bookHotel(hotel.id)"
+          label="Book Now"
+          class="w-full full"
+          [rounded]="true"
+          styleClass="w-full"
+        />
+      </div>
+    </ng-template>
+  </p-card>
+  }
+</div>
+} @else {
+<div
+  style="
+    height: 98vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  "
+>
+  <p-progressSpinner ariaLabel="loading" />
+</div>
+}

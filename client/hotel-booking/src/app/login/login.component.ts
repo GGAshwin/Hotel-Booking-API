@@ -29,7 +29,11 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     if (localStorage.getItem('authToken')) {
-      this.router.navigate(['/home']);
+      this.utilService.verifyUser().subscribe((data: any) => {
+        if (data.isValid) {
+          this.router.navigate(['/home']);
+        }
+      });
     }
   }
 

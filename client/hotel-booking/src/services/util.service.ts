@@ -10,10 +10,16 @@ export class UtilService {
   BOOKING_BASE_URL =
     'https://booking-service.cfapps.eu12.hana.ondemand.com/api/bookings';
   HOTL_SERVICE_URL =
-    'https://hotel-service-1.cfapps.eu12.hana.ondemand.com/api';
+    'https://hotel-service-1.cfapps.eu12.hana.ondemand.com/api/hotels';
+  BOOKING_SERVICE_URL =
+    'https://booking-service.cfapps.eu12.hana.ondemand.com/api/bookings';
 
   authToken = localStorage.getItem('authToken');
   constructor(private readonly http: HttpClient) {}
+
+  verifyUser() {
+    return this.http.post(`${this.AUTH_URL}/verify`, this.createHeaders());
+  }
 
   registerUser(payload: any) {
     return this.http.post(`${this.AUTH_URL}/register`, payload);
@@ -25,7 +31,7 @@ export class UtilService {
 
   getHotels() {
     this.createHeaders();
-    return this.http.get(`${this.HOTL_SERVICE_URL}/hotels`, {
+    return this.http.get(`${this.HOTL_SERVICE_URL}`, {
       headers: this.createHeaders(),
     });
   }
