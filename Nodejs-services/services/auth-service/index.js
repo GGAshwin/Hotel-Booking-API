@@ -4,10 +4,11 @@ const AuthController = require("./src/controller/AuthController");
 const UserController = require("./src/controller/UserController");
 const port = process.env.PORT || 3000;
 const environment = process.env.NODE_ENV || "development";
+const cors = require("cors");
 require("dotenv").config();
 
 app.use(express.json());
-
+app.use(cors());
 app.use("/auth", AuthController);
 app.use("/api/users", UserController);
 
