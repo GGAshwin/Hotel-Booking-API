@@ -6,7 +6,8 @@ const router = express.Router();
 
 connectAndSync();
 
-const AUTH_SERVICE_URL = "http://localhost:3000/auth";
+// const AUTH_SERVICE_URL = "http://localhost:3000/auth";
+const AUTH_SERVICE_URL = "http://auth-service.nodejs-services.svc.cluster.local/auth/verify";
 // const AUTH_SERVICE_URL =
 // "https://auth-service.cfapps.us10-001.hana.ondemand.com/auth";
 // const HOTL_SERVICE_URL =
