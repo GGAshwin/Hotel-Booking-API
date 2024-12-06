@@ -1,1 +1,43 @@
-<p>booking works!</p>
+@if(!showBusy){
+<div></div>
+<div class="flex-display">
+  @for (room of hotelRoomsData; track room) {
+  <p-card
+    header="{{ room.type }}"
+    subheader="Availibility {{ room.availability }}"
+    [style]="{ width: '360px' }"
+  >
+    <!-- <ng-template pTemplate="header">
+                          <img
+                            alt="Card"
+                            src="https://primefaces.org/cdn/primeng/images/card-ng.jpg"
+                          />
+                        </ng-template> -->
+    <p>
+      {{ room.price }}
+    </p>
+    <ng-template pTemplate="footer">
+      <div class="flex gap-3 mt-1">
+        <p-button
+          label="Book Now"
+          class="w-full full"
+          [rounded]="true"
+          styleClass="w-full"
+        />
+      </div>
+    </ng-template>
+  </p-card>
+  }
+</div>
+} @else {
+<div
+  style="
+    height: 98vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  "
+>
+  <p-progressSpinner ariaLabel="loading" />
+</div>
+}

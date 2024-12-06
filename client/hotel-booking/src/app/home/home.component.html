@@ -3,7 +3,7 @@
   @for (hotel of hotelArray; track hotel) {
   <p-card
     header="{{ hotel.name }}"
-    subheader="Card Subheader"
+    subheader="{{ hotel.location }}"
     [style]="{ width: '360px' }"
   >
     <!-- <ng-template pTemplate="header">
@@ -13,7 +13,7 @@
                     />
                   </ng-template> -->
     <p>
-      {{ hotel.location }}
+      {{ hotel.description }}
     </p>
     <ng-template pTemplate="footer">
       <div class="flex gap-3 mt-1">
