@@ -10,10 +10,24 @@ export class UtilService {
   BOOKING_BASE_URL =
     'https://booking-service.cfapps.eu12.hana.ondemand.com/api/bookings';
   HOTL_SERVICE_URL =
-    'https://hotel-service-1.cfapps.eu12.hana.ondemand.com/api';
+    'https://hotel-service-1.cfapps.eu12.hana.ondemand.com/api/hotels';
+  BOOKING_SERVICE_URL =
+    'https://booking-service.cfapps.eu12.hana.ondemand.com/api/bookings';
+  ROOM_SERVICE_URL =
+    'https://room-service.cfapps.eu12.hana.ondemand.com/api/rooms';
 
   authToken = localStorage.getItem('authToken');
   constructor(private readonly http: HttpClient) {}
+
+  verifyUser() {
+    return this.http.post(
+      `${this.AUTH_URL}/verify`,
+      {},
+      {
+        headers: this.createHeaders(),
+      }
+    );
+  }
 
   registerUser(payload: any) {
     return this.http.post(`${this.AUTH_URL}/register`, payload);
@@ -25,7 +39,25 @@ export class UtilService {
 
   getHotels() {
     this.createHeaders();
-    return this.http.get(`${this.HOTL_SERVICE_URL}/hotels`, {
+    return this.http.get(`${this.HOTL_SERVICE_URL}`, {
+      headers: this.createHeaders(),
+    });
+  }
+
+  getHotelById(hotelId: string) {
+    return this.http.get(`${this.HOTL_SERVICE_URL}/${hotelId}`, {
+      headers: this.createHeaders(),
+    });
+  }
+
+  getRoomAssociatedWithHotel(hotelId: string) {
+    return this.http.get(`${this.ROOM_SERVICE_URL}/${hotelId}`, {
+      headers: this.createHeaders(),
+    });
+  }
+
+  makeBooking(payload: any) {
+    return this.http.post(`${this.BOOKING_BASE_URL}`, payload, {
       headers: this.createHeaders(),
     });
   }

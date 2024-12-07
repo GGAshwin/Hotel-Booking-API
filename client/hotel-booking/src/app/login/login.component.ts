@@ -29,7 +29,11 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     if (localStorage.getItem('authToken')) {
-      this.router.navigate(['/home']);
+      this.utilService.verifyUser().subscribe((data: any) => {
+        if (data.isValid) {
+          this.router.navigate(['/home']);
+        }
+      });
     }
   }
 
@@ -55,6 +59,7 @@ export class LoginComponent implements OnInit {
         this.successMessage = 'Login successful!';
         this.errorMessage = null;
         localStorage.setItem('authToken', response.token); // Store the token
+        localStorage.setItem('userId', response.user_id); // Store the userId
         this.router.navigate(['/home']);
       },
       error: (err) => {

@@ -1,24 +1,29 @@
-@if (hotelArray.length > 0) {
+@if(!showBusy){
+<div>
+  <p-calendar [(ngModel)]="fromDate" />
+  <p-calendar [(ngModel)]="toDate" />
+  {{ fromDate }}
+</div>
 <div class="flex-display">
-  @for (hotel of hotelArray; track hotel) {
+  @for (room of hotelRoomsData; track room) {
   <p-card
-    header="{{ hotel.name }}"
-    subheader="{{ hotel.location }}"
+    header="{{ room.type }}"
+    subheader="Availibility {{ room.availability }}"
     [style]="{ width: '360px' }"
   >
     <!-- <ng-template pTemplate="header">
-                    <img
-                      alt="Card"
-                      src="https://primefaces.org/cdn/primeng/images/card-ng.jpg"
-                    />
-                  </ng-template> -->
+                          <img
+                            alt="Card"
+                            src="https://primefaces.org/cdn/primeng/images/card-ng.jpg"
+                          />
+                        </ng-template> -->
     <p>
-      {{ hotel.description }}
+      {{ room.price }}
     </p>
     <ng-template pTemplate="footer">
       <div class="flex gap-3 mt-1">
         <p-button
-          (onClick)="bookHotel(hotel.id)"
+          (onClick)="makeBooking(room.type, room.price)"
           label="Book Now"
           class="w-full full"
           [rounded]="true"
