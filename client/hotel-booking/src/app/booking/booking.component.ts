@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Route, Router } from '@angular/router';
 import { UtilService } from '../../services/util.service';
 import { Hotel } from '../home/home.component';
 
@@ -20,7 +20,8 @@ export class BookingComponent implements OnInit {
   showBusy = true;
   constructor(
     private route: ActivatedRoute,
-    private utilService: UtilService
+    private utilService: UtilService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -75,10 +76,13 @@ export class BookingComponent implements OnInit {
       roomType: roomType,
       price: roomPrice,
     };
-    this.utilService.makeBooking(this.bookingObj).subscribe((res) => {
+    this.utilService.makeBooking(this.bookingObj).subscribe((res: any) => {
       console.log(res);
       if (res) {
         //do something
+        this.router.navigate(['/payment/', res.id], {
+          state: { data: { price: res.price } },
+        });
       }
     });
   }

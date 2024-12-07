@@ -12,9 +12,18 @@ import { ButtonModule } from 'primeng/button';
 import { BookingComponent } from './booking/booking.component';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { CalendarModule } from 'primeng/calendar';
+import { PaymentComponent } from './payment/payment.component';
+import { FloatLabelModule } from 'primeng/floatlabel';
+import { RadioButtonModule } from 'primeng/radiobutton';
 
 @NgModule({
-  declarations: [AppComponent, LoginComponent, HomeComponent, BookingComponent],
+  declarations: [
+    AppComponent,
+    LoginComponent,
+    HomeComponent,
+    BookingComponent,
+    PaymentComponent,
+  ],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -25,6 +34,8 @@ import { CalendarModule } from 'primeng/calendar';
     ButtonModule,
     ProgressSpinnerModule,
     CalendarModule,
+    FloatLabelModule,
+    RadioButtonModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

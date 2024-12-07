@@ -15,6 +15,8 @@ export class UtilService {
     'https://booking-service.cfapps.eu12.hana.ondemand.com/api/bookings';
   ROOM_SERVICE_URL =
     'https://room-service.cfapps.eu12.hana.ondemand.com/api/rooms';
+  PAYMENTS_SERVICE_URL =
+    'https://payment-service.cfapps.us10-001.hana.ondemand.com/api/payments';
 
   authToken = localStorage.getItem('authToken');
   constructor(private readonly http: HttpClient) {}
@@ -58,6 +60,12 @@ export class UtilService {
 
   makeBooking(payload: any) {
     return this.http.post(`${this.BOOKING_BASE_URL}`, payload, {
+      headers: this.createHeaders(),
+    });
+  }
+
+  makePayment(payload: any) {
+    return this.http.post(`${this.PAYMENTS_SERVICE_URL}`, payload, {
       headers: this.createHeaders(),
     });
   }
