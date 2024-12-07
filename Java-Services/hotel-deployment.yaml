@@ -1,0 +1,43 @@
+# hotel-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hotel-deployment
+  namespace: nodejs-services
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hotel
+  template:
+    metadata:
+      labels:
+        app: hotel
+    spec:
+      containers:
+        - name: hotel
+          image: shan4488/hotel-service-image:2.0.0
+          ports:
+            - containerPort: 3003
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "production"
+            - name: AUTH_SERVICE_URL
+              value: "http://auth-service.nodejs-services.svc.cluster.local"
+            - name: ROOM_SERVICE_URL
+              value: "http://room-service.nodejs-services.svc.cluster.local"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hotel-service
+  namespace: nodejs-services
+spec:
+  selector:
+    app: hotel
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3003
+      nodePort: 30003
+  type: NodePort

@@ -1,0 +1,43 @@
+# booking-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: booking-deployment
+  namespace: nodejs-services
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: booking
+  template:
+    metadata:
+      labels:
+        app: booking
+    spec:
+      containers:
+        - name: booking
+          image: shan4488/booking-service:2.0.0
+          ports:
+            - containerPort: 3005
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "production"
+            - name: AUTH_SERVICE_URL
+              value: "http://auth-service.nodejs-services.svc.cluster.local"
+            - name: PAYMENT_SERVICE_URL
+              value: "http://payments-service.nodejs-services.svc.cluster.local"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: booking-service
+  namespace: nodejs-services
+spec:
+  selector:
+    app: booking
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3005
+      nodePort: 30005
+  type: NodePort

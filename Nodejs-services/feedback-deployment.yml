@@ -16,12 +16,20 @@ spec:
     spec:
       containers:
         - name: feedback
-          image: ggashwin/feedback-service:latest
+          image: sthuthib/feedback-service:latest
           ports:
             - containerPort: 3002
           env:
             - name: NODE_ENV
               value: "production"
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: AUTH_SERVICE_URL
+              value: "http://auth-service.nodejs-services.svc.cluster.local"
+            - name: HOTEL_SERVICE_URL
+              value: "http://hotel-service.nodejs-services.svc.cluster.local"
 ---
 apiVersion: v1
 kind: Service
