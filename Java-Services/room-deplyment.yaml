@@ -1,0 +1,41 @@
+# room-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: room-deployment
+  namespace: nodejs-services
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: room
+  template:
+    metadata:
+      labels:
+        app: room
+    spec:
+      containers:
+        - name: room
+          image: shan4488/room-service-image:1.0.0
+          ports:
+            - containerPort: 3004
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "production"
+            - name: AUTH_SERVICE_URL
+              value: "http://auth-service.nodejs-services.svc.cluster.local"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: room-service
+  namespace: nodejs-services
+spec:
+  selector:
+    app: room
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3004
+      nodePort: 30004
+  type: NodePort

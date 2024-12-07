@@ -28,6 +28,8 @@ spec:
                   fieldPath: metadata.namespace
             - name: AUTH_SERVICE_URL
               value: "http://auth-service.nodejs-services.svc.cluster.local" # Reference auth-service
+            - name: ROOM_SERVICE_URL
+              value: "http://room-service.nodejs-services.svc.cluster.local"
 ---
 apiVersion: v1
 kind: Service
